@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Spotify!{% endblock %}
+
+{% block body %}
+<form action="/search">
+    <div class="ui huge icon input">
+        <i class="search icon"></i>
+        <input name="query" type="text" placeholder="Search...">
+    </div>
+</form>
+
+{% if album_results %}
+
+<div class="albums">
+
+    <div class="controls">
+        <div class="ui label">
+            Albums
+            <div class="detail">{{album_count}}</div>
+        </div>
+    </div>
+
+    <div class="ui link cards centered">
+        
+    {% for album in album_results %}
+     <div class="card">
+        <div class="image">
+          <img src="{{ album.image_url }}">
+        </div>
+        <div class="content">
+            <div class="header">
+                {{ album.name }}
+            </div>
+            <div class="description">
+                Artist: {{ album.artist }} <br>
+                Genre: {{ album.genre }} <br>
+                Date: {{ album.dage }}
+            </div>
+        </div>
+        <div class="extra content">
+            
+        </div>
+      </div>
+    {% endfor %}
+
+    </div>
+</div>
+
+{% endif %}
+
+{% if artist_results %}
+
+    <div class="artists">
+
+    <div class="ui label">
+        Artists
+        <div class="detail">{{artist_count}}</div>
+    </div>
+
+    <div class="ui link cards centered">
+        
+    {% for artist in artist_results %}
+     <div class="card">
+        <div class="image">
+          <img src="{{ artist.image_url }}">
+        </div>
+        <div class="content">
+            <div class="header">
+                {{ artist.name }}
+            </div>
+            <div class="description">
+                Genre: {{ artist.genre }}
+            </div>
+        </div>
+        <div class="extra content">
+            
+        </div>
+      </div>
+    {% endfor %}
+
+    </div>
+</div>
+
+{% endif %}
+
+{% if track_results %}
+
+<div class="songs">
+
+    <div class="ui label">
+        Songs
+        <div class="detail">{{track_count}}</div>
+    </div>
+
+    <div class="ui link cards centered">
+        
+    {% for track in track_results %}
+     <div class="card">
+        <div class="image">
+          <img src="{{ track.image_url }}">
+        </div>
+        <div class="content">
+            <div class="header">
+                {{ track.name }}
+            </div>
+            <div class="description">
+                Artist: {{ track.artist }} <br>
+                Album: {{ track.album }}
+            </div>
+        </div>
+        <div class="extra content">
+            <audio controls>
+                <source src="{{ track.audio_url }}" type="audio/mpeg">
+            HTML5 required for audio playback.
+            </audio>
+        </div>
+      </div>
+</div>
+
+{% endfor %}
+
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>{% block title %}{% endblock %}</title>
+        <!-- Semantic UI CSS -->
+        <link rel="stylesheet" type="text/css" href="//oss.maxcdn.com/semantic-ui/2.1.4/semantic.min.css">
+        <!-- Our Overrides and Additions -->
+        <link rel="stylesheet" type="text/css" href="/static/style.css">
+    </head>
+    <body>
+      <div id="main-container" class="ui center aligned container">
+        {% block body %}{% endblock %}
+      </div>
+    </body>
+</html>
