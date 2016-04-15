@@ -1,6 +1,6 @@
 import os
 
-from flask import render_template, redirect, request
+from flask import render_template, redirect, request, jsonify
 from gmusicapi import Mobileclient
 
 from chirp import app
@@ -10,6 +10,12 @@ google = None
 @app.route("/")
 def index():
     return render_template("login.html")
+
+@app.route("/inc")
+def inc():
+    print "incrementing"
+    return jsonify(result=request.args.get("x", 0, type=int) + 1)
+
     
 @app.route("/login", methods=["POST"])
 def login():
@@ -26,6 +32,8 @@ def home():
 
 @app.route("/search")
 def search():
+    if not google:
+        return redirect("/")
 
     # Search for tracks
     results = google.search_all_access(request.args.get("query"), max_results=10)

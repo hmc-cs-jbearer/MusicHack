@@ -3,6 +3,11 @@
 {% block title %}Google Play!{% endblock %}
 
 {% block body %}
+
+<script type=text/javascript src="{{url_for('static', filename='audio-control.js') }}"></script>
+
+<span id="jqtestlabel">-1</input>
+
 <form action="/search">
     <div class="ui huge icon input">
         <i class="search icon"></i>
@@ -107,7 +112,7 @@
             </div>
         </div>
         <div class="extra content">
-            <audio controls>
+            <audio onended="getNextSong()" controls>
                 <source src="{{ track.audio_url }}" type="audio/mpeg">
             </audio>
         </div>
