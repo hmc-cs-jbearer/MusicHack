@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Spotify!{% endblock %}
+{% block title %}Google Play!{% endblock %}
 
 {% block body %}
 <form action="/search">
@@ -73,9 +73,6 @@
                 Genre: {{ artist.genre }}
             </div>
         </div>
-        <div class="extra content">
-            
-        </div>
       </div>
     {% endfor %}
 
@@ -112,7 +109,6 @@
         <div class="extra content">
             <audio controls>
                 <source src="{{ track.audio_url }}" type="audio/mpeg">
-            HTML5 required for audio playback.
             </audio>
         </div>
       </div>

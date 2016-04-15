@@ -1,53 +1,66 @@
 import os
 
-from flask import render_template, request
-from spotipy import Spotify
+from flask import render_template, redirect, request
+from gmusicapi import Mobileclient
 
 from chirp import app
 
-sp = Spotify()
+google = None
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    return render_template("login.html")
     
+@app.route("/login", methods=["POST"])
+def login():
+    global google
+    google = Mobileclient()
+    if google.login(request.form.get("username"), request.form.get("password"), Mobileclient.FROM_MAC_ADDRESS):
+        return redirect("/home")
+    else:
+        return render_template("login.html", error="Invalid username or password")
+
+@app.route("/home")
+def home():
+    return render_template("index.html")
+
 @app.route("/search")
 def search():
 
     # Search for tracks
-    results = sp.search(request.args.get("query"), limit=9, type="track")['tracks']
-    track_count = results['total']
-    items = results['items']
+    results = google.search_all_access(request.args.get("query"), max_results=10)
+    songResults = results['song_hits']
+    albumResults = results['album_hits']
+    artistResults = results['artist_hits']
+
+    track_count = len(songResults)
+    print "len:", len(songResults)
+    print songResults[0]['track']
     tracks = [{
-        "name" : track['name'],
-        "artist" : track['artists'][0]['name'] if track['artists'] else "Unknown",
-        "album" : track['album']['name'],
-        "image_url" : track['album']['images'][0]['url'] if track['album']['images'] else "",
-        "audio_url" : track['preview_url']
-    } for track in items]
+        "name" : track['title'],
+        "artist" : track['artist'],
+        "album" : track['album'],
+        "image_url" : track['albumArtRef'][0]['url'],
+        "audio_url" : google.get_stream_url(track['nid'])
+    } for track in [song['track'] for song in songResults]]
 
     # Search for artists
-    results = sp.search(request.args.get("query"), limit=9, type="artist")['artists']
-    artist_count = results['total']
-    items = results['items']
+    artist_count = len(artistResults)
     artists = [{
         "name" : artist['name'],
-        "image_url" : artist['images'][0]['url'] if artist['images'] else "",
-        "genre" : artist['genres'][0] if artist['genres'] else "Unknown"
-    } for artist in items]
+        "image_url" : artist['artistArtRef'],
+        "genre" : "Unknown"
+    } for artist in [artist['artist'] for artist in artistResults]]
 
     # Search for albums
-    results = sp.search(request.args.get("query"), limit=9, type="album")['albums']
-    album_count = results['total']
-    items = results['items']
+    album_count = len(albumResults)
     albums = [{
         "name" : album['name'],
-        # Have to get the full album object, simplifed has no artists key
-        "artist" : album['artists'][0]['name'] if album['artists'] else "Unknown",
-        "date" : album['release_date'],
-        "genre" : album['genres'][0] if album['genres'] else "Unknown",
-        "image_url" : album['images'][0]['url'] if album['images'] else ""
-    } for album in map(lambda result: sp.album(result['id']), items)]
+        "artist" : album['artist'],
+        "date" : album['year'] if 'year' in album.keys() else "Unknown",
+        "genre" : "Unknown",
+        "image_url" : album['albumArtRef']
+    } for album in [album['album'] for album in albumResults]]
 
     return render_template(
         "index.html", track_results=tracks, album_results=albums, artist_results=artists,
