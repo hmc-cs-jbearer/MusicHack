@@ -74,17 +74,26 @@ var audioNeedsSrc = true;
 </script>
 
 <div style = "text-align:right ">
+
   <form action="/new-network" method="post">
     <input type="hidden" name="uid" value="{{ uid }}">
     <a class="item">
-      <button class = "fluid ui button" type="submit"> Create new network </button>
+      <button type="submit"> Create new network </button>
     </a>
   </form>
 
-  <a href="/"><u>Logout</u> </a>
+  <form action="/join-network" method="post">
+    <input type="hidden" name="uid" value="{{ uid }}">
+    <a class="item">
+      <button type="submit"> Join a network </button>
+    </a>
+  </form>
+
+  <a href="/"><button type="button">Logout</button></a>
 
   {% if cur_network.is_admin %}
-  <a href="/add-user"> <u>Add users to network</u> </a>
+  <a href="/add-user"><button type="button">Add a user</button></a>
+
   {% endif %}
 </div>
 
@@ -153,6 +162,8 @@ Your browser does not support the audio element.
 </div>
 
 {% endif %}
-
+<div style = "text-align: right">
+  <h2 style="position: fixed; bottom: 0; width:75%"> {{cur_network.coins}} <i class = "database icon"></i></h2>
+</div>
 
 {% endblock %}
