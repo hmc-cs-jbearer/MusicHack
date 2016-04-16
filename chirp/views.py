@@ -74,12 +74,18 @@ def username_exists():
 @app.route('/invalid-email')
 def invalid_email():
     return render_template("register.html", error="invalid email")
+
+@app.route('/passwords-dont-match')
+def passwords_dont_match():
+    return render_template("register.html", error="passwords dont match")
+
 ####
 
 
 @app.route('/forgot-password')
 def forgot_password():
     return render_template("forgot-password.html")
+
 
 @app.route('/add-user')
 def add_user():

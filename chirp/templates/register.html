@@ -3,9 +3,15 @@
 <script language="javascript">
     function check() { //create new acct in firebase
         //document.write(document.getElementById("name").value);
-        var ref = new Firebase("https://musichack16.firebaseio.com");
+      var ref = new Firebase("https://musichack16.firebaseio.com");
 
-      
+      var password = document.getElementById("password").value
+      var check_password = document.getElementById("retype-password").value
+
+      if (!(password === check_password)) {
+        window.location = "/passwords-dont-match"
+      }
+
         ref.createUser({
          email    : document.getElementById("username").value,
          password : document.getElementById("password").value
@@ -53,6 +59,10 @@
 
 {% if error == "invalid email" %}
 <p style="color:red">Invalid email address</p>
+{% endif %}
+
+{% if error == "passwords dont match" %}
+<p style="color:red">Passwords dont match</p>
 {% endif %}
 
 <div class="ui form segment">
