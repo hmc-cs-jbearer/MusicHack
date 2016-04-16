@@ -7,12 +7,12 @@
   <a href="/new-network"> <u>Create new network</u> </a>
   <a href="/"><u>Logout</u> </a>
 
-  {% if network_id.is_admin == 'True' %}
+  {% if cur_network.is_admin %}
   <a href="/add-user"> <u>Add users to network</u> </a>
   {% endif %}
 </div>
 
-<form action="/search?nid={{ nid }}+uid={{ uid }}">
+<form action="/search?nid={{ nid }}&uid={{ uid }}">
   <div class="ui huge icon input">
     <i class="search icon"></i>
 
@@ -30,12 +30,17 @@
     {% for network in user_networks %}
 
     <a class="item">
-      <button class = "fluid ui button" href="/choose-network?network_id={{network}}" type> {{network.name}}</button>
+      <button class = "fluid ui button" href="/choose-network?network_id={{network.id}}" type> {{network.name}}</button>
     </a>
 
     {% endfor %}
 
   </div>
+
+  <div class = "ui centered label">
+  Music for {{ cur_network.name }}
+  </div>
+
   <div class="pusher">
     <div class="ui basic segment">
       <div class="ui card centered">
@@ -65,7 +70,7 @@
   </div>
 </div>
 
-{% if network_id.is_admin %}
+{% if cur_network.is_admin %}
 <div class = "play music centered">
   <audio controls="controls">
   <source src="track.mp3" type="audio/mpeg" />

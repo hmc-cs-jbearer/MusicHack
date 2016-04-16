@@ -52,7 +52,9 @@ def choose_network():
         'id' : one_id
     } for one_id in user_networks.keys()]
 
-    return render_template("user.html", network_id = nid, user_networks=networks, uid=uid)
+    network=user_networks[nid]
+
+    return render_template("user.html", nid=nid, cur_network=network, user_networks=networks, uid=uid)
 
 @app.route('/user')
 def user():
