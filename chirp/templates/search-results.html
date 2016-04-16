@@ -4,11 +4,14 @@
 
 {% block body %}
 
-<form action="/search?nid={{ nid }}+uid={{ uid }}">
-    <div class="ui huge icon input search">
-        <i class="search icon"></i>
-        <input name="query" type="text" placeholder="Search for songs...">
-    </div>
+<form action="/search" method="post">
+  
+  <input name="uid" type="hidden" value="{{ uid }}">
+  <input name="nid" type="hidden" value="{{ nid }}">
+  <div class="ui huge icon input">
+    <i class="search icon"></i>
+    <input name="query" type="text" placeholder="Search for a song... ">
+  </div>
 </form>
 
 {% if song_results %}
