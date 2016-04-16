@@ -96,7 +96,13 @@ def choose_network():
 @app.route('/user')
 def user():
     uid = request.args.get('uid')
-    nid = firebase.get('/users/' + uid + '/networks', None).keys()[0]
+
+    # see if the caller specified a network to display
+    nid = request.args.get('nid')
+    if not nid:
+        # if not, just get the first network from the database
+        nid = firebase.get('/users/' + uid + '/networks', None).keys()[0]
+
     admin = firebase.get('/users/' + uid + '/networks/' + nid + '/is_admin', None)
 
     return redirect("/choose-network?uid="+uid+"&nid="+nid)
@@ -128,22 +134,35 @@ def login_google():
     email = request.form.get('email')
     password = request.form.get('password')
     target_url = request.form.get('target_url')
+    nid = request.form.get('nid')
+    uid = request.form.get('uid')
     if google.login(email, password, Mobileclient.FROM_MAC_ADDRESS):
-        return redirect(target_url)
+        return redirect(target_url + '&nid=' + nid + '&uid=' + uid)
     else:
         return render_template("login-google.html", target_url=target_url, error=True)
 
-@app.route('/search')
+@app.route('/search', methods=["POST", "GET"])
 def search():
 
     results_per_page = 9
 
-    query = request.args.get("query")
-    uid = request.args.get("uid")
-    nid = request.args.get("nid")
+    query = request.form.get("query")
+    uid = request.form.get("uid")
+    nid = request.form.get("nid")
+
+    if not query:
+        query = request.args.get("query")
+    if not uid:
+        uid = request.args.get("uid")
+    if not nid:
+        nid = request.args.get("nid")
+
+    print query
+    print uid
+    print nid
 
     if not google:
-        return render_template("login-google.html", target_url="/search?query=" + query)
+        return render_template("login-google.html", target_url="/search?query=" + query, uid=uid, nid=nid)
 
     song_results = []
     try:
@@ -174,32 +193,39 @@ def add_to_queue():
     uid = request.form.get('uid')
     nid = request.form.get('nid')
 
-    points = firebase.get('/users/' + uid + '/networks/' + nid + '/points', None)
+    coins = firebase.get('/users/' + uid + '/networks/' + nid + '/coins', None)
     cost = get_song_cost(song_id)
-    if points < cost:
-        return render_template('unauthoried.html', reason="You can't afford that song!")
+    if coins < cost:
+        return render_template('unauthorized.html', reason="You can't afford that song!")
 
     queue = firebase.get('/networks/' + nid + '/queue', None)
 
     if not queue:
         # create empty queue
-        queue['front'] = None
-        queue['back'] = None
+        queue = {
+            'front' : None,
+            'back' : None
+        }
 
     back_id = queue['back']
     if back_id:
         queue[back_id]['next'] = song_id
-        queue[song_id]['requester'] = uid
+        queue[song_id] = {
+            'requester' : uid
+        }
         queue['back'] = song_id
     else:
         # Empty queue
         queue['front'] = song_id
         queue['back'] = song_id
-        queue[song_id]['requester'] = uid
+        queue[song_id] = {
+            'requester' : uid
+        }
 
-    firebase.put('/networks/' + nid + '/queue', queue)
+    firebase.put('/networks/' + nid, 'queue', queue)
+    firebase.put('/users/' + uid + '/networks/' + nid, 'coins', coins - 1)
 
-    return render_template('user.html', uid=uid)
+    return redirect('/user?uid='+uid+'&nid='+nid)
 
 @app.route('/current-song')
 def get_current_song():
