@@ -31,10 +31,19 @@ def add_user():
 def create_account():
     return render_template("register.html")
     
-@app.route('/user')
-def user():
-    art = "/images/avatar2/large/kristy.png"
-    return render_template("user.html", admin = "true")
+@app.route('/choose-network')
+def choose_network():
+    uid = request.args.get('uid')
+    nid = request.args.get('nid')
+    
+    users = firebase.get("/users", None)
+    user_networks = users[uid]["networks"]
+    networks = [{
+        'name' : user_networks[nid]['name'],
+        'id' : one_id
+    } for one_id in user_networks.keys()]
+
+    return render_template("user.html", network_id = network_id, user_networks=networks, uid=uid)
 
 @app.route('/login-google', methods=['POST'])
 def login_google():

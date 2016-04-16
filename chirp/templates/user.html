@@ -2,17 +2,12 @@
 
 {% block body %}
 
-{% if network_id %}
-<script type=text/javascript>
-  {% include "display-current-song.js" %}
-</script>
-{% endif %}
 
 <div style = "text-align:right ">
   <a href="/new-network"> <u>Create new network</u> </a>
   <a href="/"><u>Logout</u> </a>
 
-  {% if admin == "true" %}
+  {% if network_id.is_admin %}
   <a href="/add-user"> <u>Add users to network</u> </a>
   {% endif %}
 </div>
@@ -31,12 +26,13 @@
       <i class="feed icon"></i>
       Networks
     </a>
+
+    {% for network in user_networks %}
     <a class="item">
-      Network 1
+      <button class = "fluid ui button" action="/choose-network?network_id={{network.id}}"> {{network.name}}</button>
     </a>
-    <a class="item">
-      Network 2
-    </a>
+    {% endfor %}
+
   </div>
   <div class="pusher">
     <div class="ui basic segment">
@@ -67,7 +63,7 @@
   </div>
 </div>
 
-{% if admin == "true" %}
+{% if network_id.is_admin %}
 <div class = "play music centered">
   <audio controls="controls">
   <source src="track.mp3" type="audio/mpeg" />
