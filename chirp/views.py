@@ -15,6 +15,10 @@ google = None
 def login():
     return render_template("login.html")
 
+@app.route('/login-error')
+def login_error():
+    return render_template("login.html", error=True)
+
 @app.route('/new-network')
 def new_newtork():
     return render_template("new-network.html")
@@ -54,7 +58,7 @@ def choose_network():
 def user():
     uid = request.args.get('uid')
     nid = firebase.get('/users/' + uid + '/networks', None).keys()[0]
-    amdin = firebase.get('/users/' + uid + '/networks/' + nid + '/is_admin', None)
+    admin = firebase.get('/users/' + uid + '/networks/' + nid + '/is_admin', None)
 
     return redirect("/choose-network?uid="+uid+"&nid="+nid)
 
