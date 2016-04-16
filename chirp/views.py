@@ -17,7 +17,19 @@ def login():
 
 @app.route('/new-network')
 def new_newtork():
-    return render_template("new-network.html")
+    return render_template("new-network.html", uid=uid)
+
+@app.route('/add-network', methods=['POST'])
+def add_network():
+
+    uid = request.form.get('uid')
+    network_name = request.form.get('name')
+
+    firebase.put('/', network_name, {
+        "admin": uid
+        })
+
+    return redirect('/user?uid=' + uid)
 
 @app.route('/create-account')
 def register():

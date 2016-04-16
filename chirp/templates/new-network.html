@@ -1,16 +1,17 @@
 {% extends "base.html" %} {% block title %}Add new network{% endblock %} {% block body %}
 
 <div class="ui form segment">
+<form action="/add-network" method="post">
   <p>Please enter the network's name</p>
     <div class="field">
       <label>Network</label>
-      <input placeholder="WIBSTR" id="email" type="text">
+      <input name="name" placeholder="WIBSTR" id="email" type="text">
     </div>
+  <input type="hidden" name="uid" value="{{ uid }}">
   <div class="inline field">
-  <div>
-  <button onclick="check()"> Add Network </button>
-  <a href="/user"><button type="button">Back</button></a>
-  <div class="ui error message"></div>
+  <button type="submit"> Add Network </button>
+</div>
+</form>
 </div>
 
 {% endblock %}
