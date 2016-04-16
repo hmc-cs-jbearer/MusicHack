@@ -13,12 +13,10 @@
       if (error) {
           switch (error.code) {
             case "EMAIL_TAKEN":
-              document.write("email taken")
-              console.log("The new user account cannot be created because the email is already in use.");
+              window.location = "/username-exists"
               break;
             case "INVALID_EMAIL":
-              document.write("invalid email")
-              console.log("The specified email is not a valid email.");
+              window.location = "/invalid-email"
               break;
             default:
               document.write(error)
@@ -32,7 +30,6 @@
           //var userid = userData.uid;
           thisUser.set({
               name: document.getElementById("name").value,
-              coins: 3,
               username: document.getElementById("username").value,
 
               networks: {
@@ -42,16 +39,21 @@
                   is_admin: "true"
                 }
               }
-            }
-          ); //end set
+            }); //end set
         } //end else
+        window.location = '/user?uid=' + userData.uid;
       });
-
-  
-      window.location = '/user?uid=' + userData.uid;
-        
+ 
       }
 </script>
+
+{% if error == "username exists" %}
+<p style="color:red">Username already exists</p>
+{% endif %}
+
+{% if error == "invalid email" %}
+<p style="color:red">Invalid email address</p>
+{% endif %}
 
 <div class="ui form segment">
   <p>Tell us about yourself</p>

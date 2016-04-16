@@ -15,6 +15,7 @@ google = None
 def login():
     return render_template("login.html")
 
+
 @app.route('/login-error')
 def login_error():
     return render_template("login.html", error=True)
@@ -44,8 +45,18 @@ def add_network():
 
 @app.route('/create-account')
 def register():
-    print("hello from create-account")
     return render_template("register.html")
+
+#### Creating a new account errors
+@app.route('/username-exists')
+def username_exists():
+    return render_template("register.html", error="username exists")
+
+@app.route('/invalid-email')
+def invalid_email():
+    return render_template("register.html", error="invalid email")
+####
+
 
 @app.route('/forgot-password')
 def forgot_password():
