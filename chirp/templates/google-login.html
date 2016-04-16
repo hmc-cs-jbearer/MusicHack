@@ -1,0 +1,25 @@
+{% extends base %}
+
+{% block title %}Log in to Google Play{% endblock %}
+
+{% block body %}
+
+{% if error %}
+<p style="color:red">{{ Invalid username or password. }}</p>
+{% endif %}
+
+<h1 class="ui header">Please log in to your Google Play account</h1>
+<form action="/login-google" method="post">
+	<div class="ui input">
+		<input type="text" name="email" placeholder="Email...">
+	</div>
+	<div class="ui input">
+		<input type="password" name="password" placeholder="Email...">
+	</div>
+	<input type="hidden" name="target_url" value="{{ target_url }}"/>
+	<button type="submit" class="ui button">
+		Log in
+	</button>
+</form>
+
+{% endblock %}

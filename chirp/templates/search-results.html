@@ -1,0 +1,46 @@
+{% extends base %}
+
+{% block title %} Search results {% endblock %}
+
+{% block body %}
+
+<form action="/search">
+    <div class="ui huge icon input search">
+        <i class="search icon"></i>
+        <input name="query" type="text" placeholder="Search for songs...">
+    </div>
+</form>
+
+{% if songResults %}
+
+<div class="ui label">
+  Songs
+  <div class="detail">{{ songResults|length }}</div>
+</div>
+
+{% for track in song_results %}
+
+<div class="card">
+    <div class="content">
+        <img class="right floated mini ui image" src="{{ image_url }}">
+        <div class="header">track.name</div>
+        <div class="description">
+            track.artist_name
+            track.album_name
+        </div>
+    </div>
+    <div class="ui bottom attached button">
+        <i class="add icon"></i>
+        Add Friend
+    </div>
+</div>
+
+{% endfor %}
+
+{% else %}
+
+No results for query "query.value"
+
+{% endif %}
+
+{% endblock %}
