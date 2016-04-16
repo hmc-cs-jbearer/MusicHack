@@ -21,9 +21,14 @@ def login_error():
     return render_template("login.html", error=True)
 
 @app.route('/new-network', methods=['POST'])
-def new_newtork():
+def new_network():
     uid = request.form.get('uid')
     return render_template("new-network.html", uid=uid)
+
+@app.route('/enter-network', methods=['POST'])
+def enter_network():
+    uid = request.form.get('uid')
+    return render_template("enter-network.html", uid=uid)
 
 @app.route('/add-network', methods=['POST'])
 def add_network():
@@ -39,6 +44,20 @@ def add_network():
         "name": network_name,
         "coins": 210,
         "is_admin": "true",
+        })
+
+    return redirect('/user?uid=' + uid)
+
+@app.route('/join-network', methods=['POST'])
+def join_network():
+    uid = request.form.get('uid')
+    network_name = request.form.get('name')
+
+    firebase.put('/users/' + uid + '/networks/', network_name,
+        {
+        "name": network_name,
+        "coins": 210,
+        "is_admin": "false",
         })
 
     return redirect('/user?uid=' + uid)
@@ -133,11 +152,19 @@ def login_google():
 
     email = request.form.get('email')
     password = request.form.get('password')
+
     target_url = request.form.get('target_url')
     nid = request.form.get('nid')
+    if nid:
+        target_url += "?nid=" + nid
+
     uid = request.form.get('uid')
+    if uid:
+        prefix = '&' if nid else '?'
+        target_url += prefix +"uid=" + uid
+
     if google.login(email, password, Mobileclient.FROM_MAC_ADDRESS):
-        return redirect(target_url + '&nid=' + nid + '&uid=' + uid)
+        return redirect(target_url)
     else:
         return render_template("login-google.html", target_url=target_url, error=True)
 
@@ -207,38 +234,125 @@ def add_to_queue():
             'back' : None
         }
 
-    back_id = queue['back']
-    if back_id:
-        queue[back_id]['next'] = song_id
-        queue[song_id] = {
-            'requester' : uid
-        }
-        queue['back'] = song_id
-    else:
+    if not queue['back']:
         # Empty queue
         queue['front'] = song_id
         queue['back'] = song_id
         queue[song_id] = {
             'requester' : uid
         }
+    else:
+        back_id = queue['back']
+        queue[back_id]['next'] = song_id
+
+    queue[song_id] = {
+        'requester' : uid,
+        'data' : {
+            'name' : request.form.get('song_name'),
+            'artist_name' : request.form.get('artist_name'),
+            'album_name' : request.form.get('album_name'),
+            'image_url' : request.form.get('image_url')
+        }
+    }
+    queue['back'] = song_id
 
     firebase.put('/networks/' + nid, 'queue', queue)
     firebase.put('/users/' + uid + '/networks/' + nid, 'coins', coins - 1)
 
     return redirect('/user?uid='+uid+'&nid='+nid)
 
-@app.route('/current-song')
+@app.route('/prompt-google')
+def prompt_google():
+    target = request.args.get('target')
+    uid = request.args.get('uid')
+    nid = request.args.get('nid')
+    return render_template("login-google.html", target_url=target, uid=uid, nid=nid)
+
+@app.route('/get-current-song')
 def get_current_song():
     '''
     Get a dictionary representing the currently playing song on the given network.
     Returns None if no song is currently playing
     '''
-    network_id = request.args.get('network_id')
-    song_id = firebase.get("/networks/" + network_id + "/queue/front", None)
+    nid = request.args.get('nid')
+    uid = request.args.get('uid')
+
+    if not google:
+        return jsonify({
+            'redirect' : True,
+            'target' : "/user",
+            'nid' : nid,
+            'uid' : uid
+        })
+
+    queue = firebase.get("/networks/" + nid, 'queue')
+    if not queue:
+        return jsonify({'invalid' : True})
+
+    song_id = queue['front']
     if song_id:
-        return firebase.get("/networks/" + network_id + "queue/" + song_id, 'data')
+        data = queue[song_id]['data']
+        data['audio_url'] = google.get_stream_url(song_id)
+        print data
+        return jsonify(data)
     else:
-        return None
+        return jsonify({'invalid' : True})
+
+@app.route('/get-next-song')
+def get_next_song():
+    '''
+    Get a dictionary representing the currently playing song on the given network.
+    Returns None if no song is currently playing
+    '''
+    nid = request.args.get('nid')
+    uid = request.args.get('uid')
+
+    queue = firebase.get("/networks/" + nid, 'queue')
+
+    if not queue:
+        return jsonify({'invalid' : True})
+
+    song_id = queue['front']
+    if not song_id:
+        return jsonify({'invalid' : True})
+
+    if not queue[song_id]['next']:
+        # just played the last song
+        queue['front'] = None
+        queue['back'] = None
+        del queue[song_id]
+        firebase.put("/networks/" + nid, 'queue', queue)
+        return jsonify({'invalid' : True})
+
+    queue['front'] = queue[song_id]['next']
+    del queue[song_id]
+    firebase.put("/networks/" + nid, 'queue', queue)
+
+    if not google:
+        return jsonify({
+            'redirect' : True,
+            'target' : "/user",
+            'nid' : nid,
+            'uid' : uid
+        })
+
+    data = queue[queue['front']]['data']
+    data['audio_url'] = google.get_stream_url(queue['front'])
+    print data
+    return jsonify(data)
+
+@app.route("/switch-google", methods=["POST"])
+def switch_google():
+    global google
+
+    if google:
+        google.logout()
+        google=None
+
+    uid = request.form.get('uid')
+    nid = request.form.get('nid')
+
+    return redirect('/user?uid='+uid+'&nid='+nid)
 
 @app.route('/upvote')
 def upvote():

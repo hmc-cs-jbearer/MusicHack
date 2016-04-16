@@ -2,7 +2,76 @@
 
 {% block body %}
 
-<script type=text/javascript src="{{url_for('static', filename='display-current-song.js') }}"></script>"
+<script type="text/javascript">
+
+var audioNeedsSrc = true;
+
+  setInterval(
+  function()
+  {
+     $.getJSON(
+        $SCRIPT_ROOT + '/get-current-song',
+        {
+          nid : "{{ nid }}",
+          uid : "{{ uid }}"
+        },
+        function(data)
+        {
+            if (data.redirect) {
+              window.location="/prompt-google?target="+data.target+"&nid="+data.nid+"&uid="+data.uid;
+              return;
+            }
+            else if (data.invalid) {
+              return;
+            }
+
+            console.log(data);
+
+            $("#current_song_title").text(data.name);
+            $("#current_artist_name").text(data.artist_name);
+            $("#current_album_name").text(data.album_name);
+            document.getElementById("current_album_art").src = data.image_url;
+            {% if cur_network.is_admin %}
+              if (audioNeedsSrc) {
+              document.getElementById("player").src = data.audio_url;
+              audioNeedsSrc = false;
+            }
+            
+            {% endif %}
+        });
+  },
+  1000);
+
+  function nextSong() {
+    $.getJSON(
+        $SCRIPT_ROOT + '/get-next-song',
+        {
+          nid : "{{ nid }}",
+          uid : "{{ uid }}"
+        },
+        function(data)
+        {
+            if (data.redirect) {
+              window.location="/prompt-google?target="+data.target+"&nid="+data.nid+"&uid="+data.uid;
+              return;
+            }
+            else if (data.invalid) {
+              return;
+            }
+
+            console.log(data);
+
+            $("#current_song_title").text(data.name);
+            $("#current_artist_name").text(data.artist_name);
+            $("#current_album_name").text(data.album_name);
+            document.getElementById("current_album_art").src = data.image_url;
+            {% if cur_network.is_admin %}
+              document.getElementById("player").src = data.audio_url;
+            {% endif %}
+        });
+  }
+
+</script>
 
 <script language=javascript> 
   function upvote() {
@@ -20,17 +89,34 @@
 </script>
 
 <div style = "text-align:right ">
+
   <form action="/new-network" method="post">
     <input type="hidden" name="uid" value="{{ uid }}">
     <a class="item">
-      <button class = "fluid ui button" type="submit"> Create new network </button>
+      <button type="submit"> Create new network </button>
     </a>
   </form>
 
-  <a href="/"><u>Logout</u> </a>
+  <form action="/enter-network" method="post">
+    <input type="hidden" name="uid" value="{{ uid }}">
+    <a class="item">
+      <button type="submit"> Join a network </button>
+    </a>
+  </form>
+
+  <a href="/"><button type="button">Logout</button></a>
+
+  <form action="/switch-google" method="post">
+    <input type="hidden" name="uid" value="{{ uid }}">
+    <input type="hidden" name="nid" value="{{ nid }}">
+    <a class="item">
+      <button type="submit"> Switch Google accounts </button>
+    </a>
+  </form>
 
   {% if cur_network.is_admin %}
-  <a href="/add-user"> <u>Add users to network</u> </a>
+  <a href="/add-user"><button type="button">Add a user</button></a>
+
   {% endif %}
 </div>
 
@@ -72,44 +158,37 @@
   <div class="pusher">
     <div class="ui basic segment">
       <div class="ui card centered">
-  <div class="image">
-    <img id="current_album_art" src="">
-  </div>
-  <div class="content">
-      <a class = "header" id="current_song_title">No music playing right now</span>
-    <div class="description">
-      <span id="current_artist_name"></span> 
-      <p></p>
-      <span id="current_album_name"></span>
-      Album
-      <i class="left floated thumbs down icon"></i>
+        <div class="image">
+          <img id="current_album_art">
+        </div>
+        <div class="content">
+          <a class = "header" id="current_song_title">No music playing right now</a>
+          <div class="description">
+            <span id="current_artist_name"></span> 
+            <br>
+            <span id="current_album_name"></span>
+            <i class="left floated thumbs down icon"></i>
+            <button onclick="upvote()" class="ui icon button">
+              <i class="right floated thumbs up icon"></i>
+            </button>
 
-      <button onclick="upvote()" class="ui icon button">
-        <i class="right floated thumbs up icon"></i>
-      </button>
+          </div>
 
-  </div>
-</form>
-
-  <div class="extra content">
-    <a>
-      Music progress bar
-    </a>
-  </div>
-</div>
+        </div>
+      </div>
     </div>
   </div>
-</div>
 
 {% if cur_network.is_admin %}
 <div class = "play music centered">
-  <audio controls="controls">
-  <source src="track.mp3" type="audio/mpeg" />
+  <audio id="player" controls="controls" autoplay="true" onended="nextSong()">
 Your browser does not support the audio element.
 </audio>
 </div>
 
 {% endif %}
-
+<div style = "text-align: right">
+  <h2 style="position: fixed; bottom: 0; width:75%"> {{cur_network.coins}} <i class = "database icon"></i></h2>
+</div>
 
 {% endblock %}

@@ -37,6 +37,10 @@
     </div>
     <form action="/add-to-queue" method="post">
         <input type="hidden" name="song_id" value="{{ track.id }}">
+        <input type="hidden" name="song_name" value="{{ track.name }}">
+        <input type="hidden" name="artist_name" value="{{ track.artist_name }}">
+        <input type="hidden" name="album_name" value="{{ track.album_name }}">
+        <input type="hidden" name="image_url" value="{{ track.image_url }}">
         <input type="hidden" name="uid" value="{{ uid }}">
         <input type="hidden" name="nid" value="{{ nid }}">
         <button type="submit" class="ui bottom attached button">
