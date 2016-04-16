@@ -1,45 +1,55 @@
-{% extends base %}
+{% extends "base.html" %}
 
 {% block title %} Search results {% endblock %}
 
 {% block body %}
 
-<form action="/search">
+<form action="/search?nid={{ nid }}+uid={{ uid }}">
     <div class="ui huge icon input search">
         <i class="search icon"></i>
         <input name="query" type="text" placeholder="Search for songs...">
     </div>
 </form>
 
-{% if songResults %}
+{% if song_results %}
 
 <div class="ui label">
   Songs
-  <div class="detail">{{ songResults|length }}</div>
 </div>
+
+<div class="ui cards centered">
 
 {% for track in song_results %}
 
-<div class="card">
+   <div class="card">
     <div class="content">
-        <img class="right floated mini ui image" src="{{ image_url }}">
-        <div class="header">track.name</div>
-        <div class="description">
-            track.artist_name
-            track.album_name
-        </div>
+      <div class="header">
+        {{ track.name }}<br>
+        <img src="{{ track.image_url }}">
+      </div>
+      <div class="description">
+        {{ track.artist_name }} <br>
+        {{ track.album_name }}
+      </div>
     </div>
-    <div class="ui bottom attached button">
-        <i class="add icon"></i>
-        Add Friend
-    </div>
-</div>
+    <form action="/add-to-queue" method="post">
+        <input type="hidden" name="song_id" value="{{ track.id }}">
+        <input type="hidden" name="uid" value="{{ uid }}">
+        <input type="hidden" name="nid" value="{{ nid }}">
+        <button type="submit" class="ui bottom attached button">
+          <i class="add icon"></i>
+          Add to queue
+        </button>
+    </form>
+  </div>
 
 {% endfor %}
 
+</div>
+
 {% else %}
 
-No results for query "query.value"
+No results.
 
 {% endif %}
 

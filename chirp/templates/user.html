@@ -1,24 +1,81 @@
-{% extends "base.html" %} {% block title %}Yelp!{% endblock %} {% block body %}
+{% extends "base.html" %} {% block title %}Welcome{% endblock %}
 
-<div class="ui card">
+{% block body %}
+
+{% if network_id %}
+<script type=text/javascript>
+  {% include "display-current-song.js" %}
+</script>
+{% endif %}
+
+<div style = "text-align:right ">
+  <a href="/new-network"> <u>Create new network</u> </a>
+  <a href="/"><u>Logout</u> </a>
+
+  {% if admin == "true" %}
+  <a href="/add-user"> <u>Add users to network</u> </a>
+  {% endif %}
+</div>
+
+<form action="/search?nid={{ nid }}+uid={{ uid }}">
+  <div class="ui huge icon input">
+    <i class="search icon"></i>
+
+    <input name="query" type="text" placeholder="Search for a song... ">
+  </div>
+</form>
+
+<div class="ui bottom">
+  <div class="ui visible inverted vertical sidebar menu">
+    <a class="item">
+      <i class="feed icon"></i>
+      Networks
+    </a>
+    <a class="item">
+      Network 1
+    </a>
+    <a class="item">
+      Network 2
+    </a>
+  </div>
+  <div class="pusher">
+    <div class="ui basic segment">
+      <div class="ui card centered">
   <div class="image">
-    <img src="/images/avatar2/large/kristy.png">
+    <img id="current_album_art" src="">
   </div>
   <div class="content">
-    <a class="header">Kristy</a>
-    <div class="meta">
-      <span class="date">Joined in 2013</span>
-    </div>
+      <a class = "header" id="current_song_title">No music playing right now</span>
     <div class="description">
-      Kristy is an art director living in New York.
-    </div>
+      <span id="current_artist_name"></span> 
+      <p></p>
+      <span id="current_album_name"></span>
+      Album
+      <i class="left floated thumbs down icon"></i>
+      <i class="right floated thumbs up icon"></i>
+
   </div>
+</form>
+
   <div class="extra content">
     <a>
-      <i class="user icon"></i>
-      22 Friends
+      Music progress bar
     </a>
   </div>
 </div>
+    </div>
+  </div>
+</div>
+
+{% if admin == "true" %}
+<div class = "play music centered">
+  <audio controls="controls">
+  <source src="track.mp3" type="audio/mpeg" />
+Your browser does not support the audio element.
+</audio>
+</div>
+
+{% endif %}
+
 
 {% endblock %}
