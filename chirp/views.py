@@ -15,6 +15,7 @@ google = None
 def login():
     return render_template("login.html")
 
+
 @app.route('/login-error')
 def login_error():
     return render_template("login.html", error=True)
@@ -58,8 +59,18 @@ def join_network():
 
 @app.route('/create-account')
 def register():
-    print("hello from create-account")
     return render_template("register.html")
+
+#### Creating a new account errors
+@app.route('/username-exists')
+def username_exists():
+    return render_template("register.html", error="username exists")
+
+@app.route('/invalid-email')
+def invalid_email():
+    return render_template("register.html", error="invalid email")
+####
+
 
 @app.route('/forgot-password')
 def forgot_password():
@@ -99,7 +110,13 @@ def choose_network():
 @app.route('/user')
 def user():
     uid = request.args.get('uid')
-    nid = firebase.get('/users/' + uid + '/networks', None).keys()[0]
+
+    # see if the caller specified a network to display
+    nid = request.args.get('nid')
+    if not nid:
+        # if not, just get the first network from the database
+        nid = firebase.get('/users/' + uid + '/networks', None).keys()[0]
+
     admin = firebase.get('/users/' + uid + '/networks/' + nid + '/is_admin', None)
 
     return redirect("/choose-network?uid="+uid+"&nid="+nid)
@@ -131,22 +148,35 @@ def login_google():
     email = request.form.get('email')
     password = request.form.get('password')
     target_url = request.form.get('target_url')
+    nid = request.form.get('nid')
+    uid = request.form.get('uid')
     if google.login(email, password, Mobileclient.FROM_MAC_ADDRESS):
-        return redirect(target_url)
+        return redirect(target_url + '&nid=' + nid + '&uid=' + uid)
     else:
         return render_template("login-google.html", target_url=target_url, error=True)
 
-@app.route('/search')
+@app.route('/search', methods=["POST", "GET"])
 def search():
 
     results_per_page = 9
 
-    query = request.args.get("query")
-    uid = request.args.get("uid")
-    nid = request.args.get("nid")
+    query = request.form.get("query")
+    uid = request.form.get("uid")
+    nid = request.form.get("nid")
+
+    if not query:
+        query = request.args.get("query")
+    if not uid:
+        uid = request.args.get("uid")
+    if not nid:
+        nid = request.args.get("nid")
+
+    print query
+    print uid
+    print nid
 
     if not google:
-        return render_template("login-google.html", target_url="/search?query=" + query)
+        return render_template("login-google.html", target_url="/search?query=" + query, uid=uid, nid=nid)
 
     song_results = []
     try:
@@ -177,43 +207,62 @@ def add_to_queue():
     uid = request.form.get('uid')
     nid = request.form.get('nid')
 
-    points = firebase.get('/users/' + uid + '/networks/' + nid + '/points', None)
+    coins = firebase.get('/users/' + uid + '/networks/' + nid + '/coins', None)
     cost = get_song_cost(song_id)
-    if points < cost:
-        return render_template('unauthoried.html', reason="You can't afford that song!")
+    if coins < cost:
+        return render_template('unauthorized.html', reason="You can't afford that song!")
 
     queue = firebase.get('/networks/' + nid + '/queue', None)
 
     if not queue:
         # create empty queue
-        queue['front'] = None
-        queue['back'] = None
+        queue = {
+            'front' : None,
+            'back' : None
+        }
 
-    back_id = queue['back']
-    if back_id:
-        queue[back_id]['next'] = song_id
-        queue[song_id]['requester'] = uid
-        queue['back'] = song_id
-    else:
+    if not queue['back']:
         # Empty queue
         queue['front'] = song_id
         queue['back'] = song_id
-        queue[song_id]['requester'] = uid
+        queue[song_id] = {
+            'requester' : uid
+        }
+    else:
+        back_id = queue['back']
+        queue[back_id]['next'] = song_id
 
-    firebase.put('/networks/' + nid + '/queue', queue)
+    queue[song_id] = {
+        'requester' : uid,
+        'data' : {
+            'name' : request.form.get('song_name'),
+            'artist_name' : request.form.get('artist_name'),
+            'album_name' : request.form.get('album_name'),
+            'image_url' : request.form.get('image_url')
+        }
+    }
+    queue['back'] = song_id
 
-    return render_template('user.html', uid=uid)
+    firebase.put('/networks/' + nid, 'queue', queue)
+    firebase.put('/users/' + uid + '/networks/' + nid, 'coins', coins - 1)
 
-@app.route('/current-song')
+    return redirect('/user?uid='+uid+'&nid='+nid)
+
+@app.route('/get-current-song')
 def get_current_song():
     '''
     Get a dictionary representing the currently playing song on the given network.
     Returns None if no song is currently playing
     '''
-    network_id = request.args.get('network_id')
-    song_id = firebase.get("/networks/" + network_id + "/queue/front", None)
+    nid = request.args.get('nid')
+
+    queue = firebase.get("/networks/" + nid, 'queue')
+    song_id = queue['front']
+    data = queue[song_id]['data']
+    data['audio_url'] = google.get_stream_url(song_id)
+
     if song_id:
-        return firebase.get("/networks/" + network_id + "queue/" + song_id, 'data')
+        return data
     else:
         return None
 
