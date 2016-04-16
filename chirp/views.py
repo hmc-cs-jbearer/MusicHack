@@ -15,6 +15,10 @@ google = None
 def login():
     return render_template("login.html")
 
+@app.route('/login-error')
+def login_error():
+    return render_template("login.html", error=True)
+
 @app.route('/new-network')
 def new_newtork():
     return render_template("new-network.html", uid=uid)
@@ -50,23 +54,32 @@ def create_account():
     
 @app.route('/choose-network')
 def choose_network():
-    uid = request.args.get('uid')
-    nid = request.args.get('nid')
+    uid = request.form.get('uid')
+    nid = request.form.get('nid')
+
+    if not uid:
+        uid = request.args.get('uid')
+    if not nid:
+        nid = request.args.get('nid')
     
     users = firebase.get("/users", None)
     user_networks = users[uid]["networks"]
     networks = [{
-        'name' : user_networks[nid]['name'],
+        'name' : user_networks[one_id]['name'],
         'id' : one_id
     } for one_id in user_networks.keys()]
 
-    return render_template("user.html", network_id = nid, user_networks=networks, uid=uid)
+    network=user_networks[nid]
+
+    print network
+
+    return render_template("user.html", nid=nid, cur_network=network, user_networks=networks, uid=uid)
 
 @app.route('/user')
 def user():
     uid = request.args.get('uid')
     nid = firebase.get('/users/' + uid + '/networks', None).keys()[0]
-    amdin = firebase.get('/users/' + uid + '/networks/' + nid + '/is_admin', None)
+    admin = firebase.get('/users/' + uid + '/networks/' + nid + '/is_admin', None)
 
     return redirect("/choose-network?uid="+uid+"&nid="+nid)
 
@@ -149,6 +162,12 @@ def add_to_queue():
         return render_template('unauthoried.html', reason="You can't afford that song!")
 
     queue = firebase.get('/networks/' + nid + '/queue', None)
+
+    if not queue:
+        # create empty queue
+        queue['front'] = None
+        queue['back'] = None
+
     back_id = queue['back']
     if back_id:
         queue[back_id]['next'] = song_id

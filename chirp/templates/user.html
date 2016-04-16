@@ -2,17 +2,18 @@
 
 {% block body %}
 
+<script type=text/javascript src="{{url_for('static', filename='display-current-song.js') }}"></script>"
 
 <div style = "text-align:right ">
   <a href="/new-network"> <u>Create new network</u> </a>
   <a href="/"><u>Logout</u> </a>
 
-  {% if network_id.is_admin %}
+  {% if cur_network.is_admin %}
   <a href="/add-user"> <u>Add users to network</u> </a>
   {% endif %}
 </div>
 
-<form action="/search?nid={{ nid }}+uid={{ uid }}">
+<form action="/search?nid={{ nid }}&uid={{ uid }}">
   <div class="ui huge icon input">
     <i class="search icon"></i>
 
@@ -28,12 +29,23 @@
     </a>
 
     {% for network in user_networks %}
+
+    <form action="/choose-network">
+    <input type="hidden" name="uid" value="{{ uid }}">
+    <input type="hidden" name="nid" value="{{ network.id }}">
     <a class="item">
-      <button class = "fluid ui button" action="/choose-network?network_id={{network.id}}"> {{network.name}}</button>
+      <button class = "fluid ui button" type="submit"> {{network.name}}</button>
     </a>
+    </form>
+
     {% endfor %}
 
   </div>
+
+  <div class = "ui centered label">
+  Music for {{ cur_network.name }}
+  </div>
+
   <div class="pusher">
     <div class="ui basic segment">
       <div class="ui card centered">
@@ -63,7 +75,7 @@
   </div>
 </div>
 
-{% if network_id.is_admin %}
+{% if cur_network.is_admin %}
 <div class = "play music centered">
   <audio controls="controls">
   <source src="track.mp3" type="audio/mpeg" />
