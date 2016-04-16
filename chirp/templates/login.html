@@ -4,18 +4,19 @@
     function check() { //create new acct in firebase
         //document.write(document.getElementById("name").value);
         var ref = new Firebase("https://hackathonpractice.firebaseio.com");
-        ref.createUser({
-         email    : document.getElementById("useranme").value,
+        ref.authWithPassword({
+         email    : document.getElementById("username").value,
          password : document.getElementById("password").value
        }, function(error, userData) {
       if (error) {
       console.log("Error creating user:", error);
       } else {
-      console.log("Successfully created user account with uid:", userData.uid);
+      console.log("Successfully authenticated user account with uid:", userData.uid);
+      window.location = '/user?uid=' + userData.uid;
   }
         });
         
-        window.location = '/';
+        
       }
 </script>
 
@@ -31,7 +32,7 @@
     </div>
   <div class="inline field">
   <div>
-  <a href="/user"><button type="button">Sign in</button></a>
+  <button onclick="check()" type="button">Sign in</button>
   <a href="/create-account"><button type="button">Create new account</button></a>
   <div class="ui error message"></div>
   <a href="/forgot-password"> Forgot Password? </a>
