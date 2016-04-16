@@ -42,17 +42,24 @@ def create_account():
     
 @app.route('/choose-network')
 def choose_network():
-    uid = request.args.get('uid')
-    nid = request.args.get('nid')
+    uid = request.form.get('uid')
+    nid = request.form.get('nid')
+
+    if not uid:
+        uid = request.args.get('uid')
+    if not nid:
+        nid = request.args.get('nid')
     
     users = firebase.get("/users", None)
     user_networks = users[uid]["networks"]
     networks = [{
-        'name' : user_networks[nid]['name'],
+        'name' : user_networks[one_id]['name'],
         'id' : one_id
     } for one_id in user_networks.keys()]
 
     network=user_networks[nid]
+
+    print network
 
     return render_template("user.html", nid=nid, cur_network=network, user_networks=networks, uid=uid)
 

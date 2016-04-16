@@ -2,6 +2,7 @@
 
 {% block body %}
 
+<script type=text/javascript src="{{url_for('static', filename='choose-network.js') }}"></script>"
 
 <div style = "text-align:right ">
   <a href="/new-network"> <u>Create new network</u> </a>
@@ -29,9 +30,13 @@
 
     {% for network in user_networks %}
 
+    <form action="/choose-network">
+    <input type="hidden" name="uid" value="{{ uid }}">
+    <input type="hidden" name="nid" value="{{ network.id }}">
     <a class="item">
-      <button class = "fluid ui button" href="/choose-network?network_id={{network.id}}" type> {{network.name}}</button>
+      <button class = "fluid ui button" type="submit"> {{network.name}}</button>
     </a>
+    </form>
 
     {% endfor %}
 
