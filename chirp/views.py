@@ -13,7 +13,8 @@ google = None
 
 @app.route('/')
 def login():
-    return render_template("login.html")
+    #return render_template("login.html")
+    return redirect("/search?query=warehouse")
 
 @app.route('/new-network')
 def new_newtork():
@@ -38,20 +39,20 @@ def login_google():
 
     google = Mobileclient()
 
-    email = request.forms.get('email')
-    password = request.forms.get('password')
-    target_url = request.forms.get('target_url')
+    email = request.form.get('email')
+    password = request.form.get('password')
+    target_url = request.form.get('target_url')
     if google.login(email, password, Mobileclient.FROM_MAC_ADDRESS):
-        return redirect(request.forms.get('target_url'))
+        return redirect(target_url)
     else:
         return render_template("login-google.html", target_url=target_url, error=True)
 
 @app.route('/search')
 def search():
 
-    results_per_page = 10
+    results_per_page = 9
 
-    query = request.arg.get("query")
+    query = request.args.get("query")
 
     if not google:
         return render_template("login-google.html", target_url="/search?query=" + query)
@@ -63,7 +64,7 @@ def search():
         song_results = google.get_all_songs(incremental=True)[:results_per_page]
 
     songs = [{
-        "name" : track['name'],
+        "name" : track['title'],
         "artist_name" : track['artist'],
         "album_name" : track['album'],
         "image_url" : track['albumArtRef'][0]['url'],

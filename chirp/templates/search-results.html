@@ -1,4 +1,4 @@
-{% extends base %}
+{% extends "base.html" %}
 
 {% block title %} Search results {% endblock %}
 
@@ -11,35 +11,40 @@
     </div>
 </form>
 
-{% if songResults %}
+{% if song_results %}
 
 <div class="ui label">
   Songs
-  <div class="detail">{{ songResults|length }}</div>
 </div>
+
+<div class="ui cards centered">
 
 {% for track in song_results %}
 
-<div class="card">
+   <div class="card">
     <div class="content">
-        <img class="right floated mini ui image" src="{{ image_url }}">
-        <div class="header">track.name</div>
-        <div class="description">
-            track.artist_name
-            track.album_name
-        </div>
+      <div class="header">
+        {{ track.name }}<br>
+        <img src="{{ track.image_url }}">
+      </div>
+      <div class="description">
+        {{ track.artist_name }} <br>
+        {{ track.album_name }}
+      </div>
     </div>
     <div class="ui bottom attached button">
-        <i class="add icon"></i>
-        Add Friend
+      <i class="add icon"></i>
+      Add to queue
     </div>
-</div>
+  </div>
 
 {% endfor %}
 
+</div>
+
 {% else %}
 
-No results for query "query.value"
+No results.
 
 {% endif %}
 
