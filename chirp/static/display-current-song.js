@@ -4,7 +4,7 @@ setInterval(
      $.getJSON(
         $SCRIPT_ROOT + '/get-current-song',
         {
-          network_id : "{{ nid }}"
+          nid : "{{ nid }}"
         },
         function(data)
         {

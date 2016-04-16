@@ -152,11 +152,19 @@ def login_google():
 
     email = request.form.get('email')
     password = request.form.get('password')
+
     target_url = request.form.get('target_url')
     nid = request.form.get('nid')
+    if nid:
+        target_url += "?nid=" + nid
+
     uid = request.form.get('uid')
+    if uid:
+        prefix = '&' if nid else '?'
+        target_url += prefix +"uid=" + uid
+
     if google.login(email, password, Mobileclient.FROM_MAC_ADDRESS):
-        return redirect(target_url + '&nid=' + nid + '&uid=' + uid)
+        return redirect(target_url)
     else:
         return render_template("login-google.html", target_url=target_url, error=True)
 
@@ -253,6 +261,13 @@ def add_to_queue():
 
     return redirect('/user?uid='+uid+'&nid='+nid)
 
+@app.route('/prompt-google')
+def prompt_google():
+    target = request.args.get('target')
+    uid = request.args.get('uid')
+    nid = request.args.get('nid')
+    return render_template("login-google.html", target_url=target, uid=uid, nid=nid)
+
 @app.route('/get-current-song')
 def get_current_song():
     '''
@@ -260,16 +275,71 @@ def get_current_song():
     Returns None if no song is currently playing
     '''
     nid = request.args.get('nid')
+    uid = request.args.get('uid')
+
+    if not google:
+        return jsonify({
+            'redirect' : True,
+            'target' : "/user",
+            'nid' : nid,
+            'uid' : uid
+        })
 
     queue = firebase.get("/networks/" + nid, 'queue')
-    song_id = queue['front']
-    data = queue[song_id]['data']
-    data['audio_url'] = google.get_stream_url(song_id)
+    if not queue:
+        return jsonify({'invalid' : True})
 
+    song_id = queue['front']
     if song_id:
-        return data
+        data = queue[song_id]['data']
+        data['audio_url'] = google.get_stream_url(song_id)
+        print data
+        return jsonify(data)
     else:
-        return None
+        return jsonify({'invalid' : True})
+
+@app.route('/get-next-song')
+def get_next_song():
+    '''
+    Get a dictionary representing the currently playing song on the given network.
+    Returns None if no song is currently playing
+    '''
+    nid = request.args.get('nid')
+    uid = request.args.get('uid')
+
+    queue = firebase.get("/networks/" + nid, 'queue')
+
+    if not queue:
+        return jsonify({'invalid' : True})
+
+    song_id = queue['front']
+    if not song_id:
+        return jsonify({'invalid' : True})
+
+    if not queue[song_id]['next']:
+        # just played the last song
+        queue['front'] = None
+        queue['back'] = None
+        del queue[song_id]
+        firebase.put("/networks/" + nid, 'queue', queue)
+        return jsonify({'invalid' : True})
+
+    queue['front'] = queue[song_id]['next']
+    del queue[song_id]
+    firebase.put("/networks/" + nid, 'queue', queue)
+
+    if not google:
+        return jsonify({
+            'redirect' : True,
+            'target' : "/user",
+            'nid' : nid,
+            'uid' : uid
+        })
+
+    data = queue[queue['front']]['data']
+    data['audio_url'] = google.get_stream_url(queue['front'])
+    print data
+    return jsonify(data)
 
 def get_song_cost(song_id):
     return 1
