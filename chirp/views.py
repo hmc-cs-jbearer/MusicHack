@@ -30,7 +30,7 @@ def add_network():
     uid = request.form.get('uid')
     network_name = request.form.get('name')
 
-    firebase.put('/', network_name, {
+    firebase.put('/networks', network_name, {
         "admin": uid
         })
 
@@ -239,6 +239,42 @@ def get_current_song():
         return firebase.get("/networks/" + network_id + "queue/" + song_id, 'data')
     else:
         return None
+
+@app.route('/upvote')
+def upvote():
+    nid = request.args.get("nid")
+    uid = request.args.get("uid") 
+
+    queuePath = "/networks/" + nid + "/queue/"
+
+    # get song from the front of the queue
+    song_id = firebase.get(queuePath, "front")
+
+    # make sure the user can only upvote the song once
+    upvoters = firebase.get(queuePath + song_id, "upvotes")
+
+    if upvoters:
+        keys = upvoters.keys()
+        for key in keys:
+            if uid == key:
+                return jsonify({uid: 2})
+
+
+    # get requester
+    requester = firebase.get(queuePath + song_id + "/", "requester")
+    # increments the number of coins (hopefully)
+    
+    nidPath = "/users/" + requester + "/networks/" + nid + "/"
+
+    numCoins = firebase.get(nidPath, "coins")
+
+    firebase.put(nidPath, "coins", int(numCoins) + 1)
+
+    # adds the userid to the song (hopefully)
+    firebase.put(queuePath + song_id + "/upvotes/", uid, "hello")
+    
+    return jsonify({uid: 2})
+    
 
 def get_song_cost(song_id):
     return 1

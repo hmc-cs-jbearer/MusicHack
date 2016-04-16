@@ -4,6 +4,21 @@
 
 <script type=text/javascript src="{{url_for('static', filename='display-current-song.js') }}"></script>"
 
+<script language=javascript> 
+  function upvote() {
+    $.getJSON($SCRIPT_ROOT + '/upvote',
+        {
+            nid : "{{ nid }}",
+            uid : "{{ uid }}"
+        },
+        function(data) {
+            //$('input[name="jqtestlabel"]').value = data;
+            $("#jqtestlabel").text(data.result);
+        });
+
+  }
+</script>
+
 <div style = "text-align:right ">
   <form action="/new-network" method="post">
     <input type="hidden" name="uid" value="{{ uid }}">
@@ -68,7 +83,10 @@
       <span id="current_album_name"></span>
       Album
       <i class="left floated thumbs down icon"></i>
-      <i class="right floated thumbs up icon"></i>
+
+      <button onclick="upvote()" class="ui icon button">
+        <i class="right floated thumbs up icon"></i>
+      </button>
 
   </div>
 </form>
