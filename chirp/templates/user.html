@@ -1,4 +1,12 @@
-{% extends "base.html" %} {% block title %}Yelp!{% endblock %} {% block body %}
+{% extends "base.html" %} {% block title %}Yelp!{% endblock %}
+
+{% block body %}
+<form action="/search">
+  <div class="ui huge icon input">
+    <i class="search icon"></i>
+    <input name="search for song" type="text" placeholder="Search...">
+  </div>
+</form>
 
 <div class="ui card">
   <div class="image">
