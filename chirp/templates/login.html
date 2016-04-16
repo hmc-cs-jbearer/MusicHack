@@ -1,0 +1,43 @@
+{% extends "base.html" %} {% block title %}Yelp!{% endblock %} {% block body %}
+
+<script language="javascript">
+    function check() { //create new acct in firebase
+        //document.write(document.getElementById("name").value);
+        var ref = new Firebase("https://hackathonpractice.firebaseio.com");
+        ref.createUser({
+         email    : document.getElementById("useranme").value,
+         password : document.getElementById("password").value
+       }, function(error, userData) {
+      if (error) {
+      console.log("Error creating user:", error);
+      } else {
+      console.log("Successfully created user account with uid:", userData.uid);
+  }
+        });
+        
+        window.location = '/';
+      }
+</script>
+
+<div class="ui form segment">
+  <p>Login!</p>
+    <div class="field">
+      <label>Username</label>
+      <input placeholder="Username" id="username" type="text">
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input placeholder="Password" type="password" id="password">
+    </div>
+  <div class="inline field">
+  <div>
+  <button onclick="check()"> Sign in </button>
+  <button onclick="check()"> Create account</button>
+  <div class="ui error message"></div>
+  <a href="/forgot-password"> Forgot Password? </a>
+</div>
+
+
+
+
+{% endblock %}
