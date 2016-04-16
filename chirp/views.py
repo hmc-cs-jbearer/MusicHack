@@ -46,20 +46,20 @@ def login_google():
 
     google = Mobileclient()
 
-    email = request.forms.get('email')
-    password = request.forms.get('password')
-    target_url = request.forms.get('target_url')
+    email = request.form.get('email')
+    password = request.form.get('password')
+    target_url = request.form.get('target_url')
     if google.login(email, password, Mobileclient.FROM_MAC_ADDRESS):
-        return redirect(request.forms.get('target_url'))
+        return redirect(target_url)
     else:
         return render_template("login-google.html", target_url=target_url, error=True)
 
 @app.route('/search')
 def search():
 
-    results_per_page = 10
+    results_per_page = 9
 
-    query = request.arg.get("query")
+    query = request.args.get("query")
 
     if not google:
         return render_template("login-google.html", target_url="/search?query=" + query)
@@ -71,7 +71,7 @@ def search():
         song_results = google.get_all_songs(incremental=True)[:results_per_page]
 
     songs = [{
-        "name" : track['name'],
+        "name" : track['title'],
         "artist_name" : track['artist'],
         "album_name" : track['album'],
         "image_url" : track['albumArtRef'][0]['url'],
@@ -79,3 +79,16 @@ def search():
     } for track in [result['track'] for result in song_results]]
 
     return render_template("search-results.html", song_results=songs)
+
+@app.route('/current-song')
+def get_current_song():
+    '''
+    Get a dictionary representing the currently playing song on the given network.
+    Returns None if no song is currently playing
+    '''
+    network_id = request.args.get('network_id')
+    song_id = firebase.get("/networks/" + network_id + "/queue/front", None)
+    if song_id:
+        return firebase.get("/networks/" + network_id + "queue/" + song_id, 'data')
+    else:
+        return None

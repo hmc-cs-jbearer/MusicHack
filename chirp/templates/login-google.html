@@ -1,11 +1,11 @@
-{% extends base %}
+{% extends "base.html" %}
 
 {% block title %}Log in to Google Play{% endblock %}
 
 {% block body %}
 
 {% if error %}
-<p style="color:red">{{ Invalid username or password. }}</p>
+<p style="color:red">Invalid username or password.</p>
 {% endif %}
 
 <h1 class="ui header">Please log in to your Google Play account</h1>
