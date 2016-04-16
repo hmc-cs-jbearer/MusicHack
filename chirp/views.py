@@ -25,6 +25,11 @@ def new_network():
     uid = request.form.get('uid')
     return render_template("new-network.html", uid=uid)
 
+@app.route('/enter-network', methods=['POST'])
+def enter_network():
+    uid = request.form.get('uid')
+    return render_template("enter-network.html", uid=uid)
+
 @app.route('/add-network', methods=['POST'])
 def add_network():
     uid = request.form.get('uid')
@@ -51,7 +56,7 @@ def join_network():
     firebase.put('/users/' + uid + '/networks/', network_name,
         {
         "name": network_name,
-        "coins": 3,
+        "coins": 210,
         "is_admin": "false",
         })
 
