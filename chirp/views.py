@@ -23,6 +23,11 @@ def new_newtork():
 def forgot_password():
 	return render_template("forgot-password.html")
 
+@app.route('/user')
+def user():
+	art = "/images/avatar2/large/kristy.png"
+	return render_template("user.html")
+
 @app.route('/search')
 def search():
     RESULTS_PER_PAGE = 10
