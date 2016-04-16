@@ -12,11 +12,11 @@
   {% endif %}
 </div>
 
-<form action="/search">
+<form action="/search?nid={{ nid }}+uid={{ uid }}">
   <div class="ui huge icon input">
     <i class="search icon"></i>
 
-    <input name="search for song" type="text" placeholder="Search for a song... ">
+    <input name="query" type="text" placeholder="Search for a song... ">
   </div>
 </form>
 

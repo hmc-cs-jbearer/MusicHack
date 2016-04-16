@@ -4,7 +4,7 @@
 
 {% block body %}
 
-<form action="/search">
+<form action="/search?nid={{ nid }}+uid={{ uid }}">
     <div class="ui huge icon input search">
         <i class="search icon"></i>
         <input name="query" type="text" placeholder="Search for songs...">
@@ -32,10 +32,15 @@
         {{ track.album_name }}
       </div>
     </div>
-    <div class="ui bottom attached button">
-      <i class="add icon"></i>
-      Add to queue
-    </div>
+    <form action="/add-to-queue" method="post">
+        <input type="hidden" name="song_id" value="{{ track.id }}">
+        <input type="hidden" name="uid" value="{{ uid }}">
+        <input type="hidden" name="nid" value="{{ nid }}">
+        <button type="submit" class="ui bottom attached button">
+          <i class="add icon"></i>
+          Add to queue
+        </button>
+    </form>
   </div>
 
 {% endfor %}

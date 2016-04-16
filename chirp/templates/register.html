@@ -1,5 +1,50 @@
 {% extends "base.html" %} {% block title %}Create new account{% endblock %} {% block body %}
 
+<script language="javascript">
+    function check() { //create new acct in firebase
+        //document.write(document.getElementById("name").value);
+        var ref = new Firebase("https://hackathonpractice.firebaseio.com");
+
+
+        ref.createUser({
+         email    : document.getElementById("username").value,
+         password : document.getElementById("password").value
+       }, function(error, userData) {
+      if (error) {
+          switch (error.code) {
+            case "EMAIL_TAKEN":
+              document.write("email taken")
+              console.log("The new user account cannot be created because the email is already in use.");
+              break;
+            case "INVALID_EMAIL":
+              document.write("invalid email")
+              console.log("The specified email is not a valid email.");
+              break;
+            default:
+              document.write(error)
+              console.log("Error creating user:", error);
+          }
+      } else {
+          ref.set({
+            users: userData.uid
+          });
+          var users = ref.child("users");
+          var thisUser = users.child(userData.uid);
+
+          //var userid = userData.uid;
+          thisUser.set({
+              name: document.getElementById("name").value,
+              coins: 3,
+            }
+          ); //end set
+        } //end else
+      });
+        
+      window.location = '/user?user_id=' + userData.uid;
+        
+      }
+</script>
+
 <div class="ui form segment">
   <p>Tell us about yourself</p>
     <div class="field">
@@ -24,8 +69,5 @@
   <a href="/"><button type="button">Back</button></a>
   <div class="ui error message"></div>
 </div>
-
-
-
 
 {% endblock %}
