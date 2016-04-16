@@ -15,6 +15,10 @@ google = None
 def login():
     return render_template("login.html")
 
+@app.route('/forgot-password')
+def forgot_password():
+	return render_template("forgot-password.html")
+
 @app.route('/search')
 def search():
     RESULTS_PER_PAGE = 10
