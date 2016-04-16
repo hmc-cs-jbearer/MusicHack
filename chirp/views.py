@@ -19,6 +19,11 @@ def login():
 def new_newtork():
     return render_template("new-network.html")
 
+@app.route('/create-account')
+def register():
+    print("hello from create-account")
+    return render_template("register.html")
+
 @app.route('/forgot-password')
 def forgot_password():
     return render_template("forgot-password.html")
@@ -27,6 +32,21 @@ def forgot_password():
 def user():
     art = "/images/avatar2/large/kristy.png"
     return render_template("user.html")
+
+@app.route('/upload-user', methods=["POST"])
+def uploud_user():
+    print("hello from upload-user")
+    
+    userid = request.args.get("userid")
+    name = request.args.get("name")
+    firebase.put('/users', userid,
+        {
+        "name" : name,
+        "coins" : 3
+        })
+        
+    return True
+
 
 @app.route('/login-google', methods=['POST'])
 def login_google():
