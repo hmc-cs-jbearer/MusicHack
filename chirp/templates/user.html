@@ -5,10 +5,18 @@
 <script type=text/javascript src="{{url_for('static', filename='display-current-song.js') }}"></script>"
 
 <div style = "text-align:right ">
+
   <form action="/new-network" method="post">
     <input type="hidden" name="uid" value="{{ uid }}">
     <a class="item">
-      <button class = "fluid ui button" type="submit"> Create new network </button>
+      <button type="submit"> Create new network </button>
+    </a>
+  </form>
+
+  <form action="/join-network" method="post">
+    <input type="hidden" name="uid" value="{{ uid }}">
+    <a class="item">
+      <button type="submit"> Join a network </button>
     </a>
   </form>
 
