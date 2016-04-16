@@ -38,8 +38,11 @@ def create_account():
     
 @app.route('/user')
 def user():
-    art = "/images/avatar2/large/kristy.png"
-    return render_template("user.html", admin = "true")
+    uid = request.args.get('uid')
+    nid = firebase.get('/users/' + uid + '/networks', None).keys()[0]
+    amdin = firebase.get('/users/' + uid + '/networks/' + nid + '/is_admin', None)
+
+    return render_template("user.html", uid=uid, nid=nid, admin = admin)
 
 @app.route('/upload-user', methods=["POST"])
 def uploud_user():
