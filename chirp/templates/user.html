@@ -3,7 +3,74 @@
 {% block body %}
 
 <script type="text/javascript">
-  {% include "display-current-song.js" %}  
+
+var audioNeedsSrc = true;
+
+  setInterval(
+  function()
+  {
+     $.getJSON(
+        $SCRIPT_ROOT + '/get-current-song',
+        {
+          nid : "{{ nid }}",
+          uid : "{{ uid }}"
+        },
+        function(data)
+        {
+            if (data.redirect) {
+              window.location="/prompt-google?target="+data.target+"&nid="+data.nid+"&uid="+data.uid;
+              return;
+            }
+            else if (data.invalid) {
+              return;
+            }
+
+            console.log(data);
+
+            $("#current_song_title").text(data.name);
+            $("#current_artist_name").text(data.artist_name);
+            $("#current_album_name").text(data.album_name);
+            document.getElementById("current_album_art").src = data.image_url;
+            {% if cur_network.is_admin %}
+              if (audioNeedsSrc) {
+              document.getElementById("player").src = data.audio_url;
+              audioNeedsSrc = false;
+            }
+            
+            {% endif %}
+        });
+  },
+  1000);
+
+  function nextSong() {
+    $.getJSON(
+        $SCRIPT_ROOT + '/get-next-song',
+        {
+          nid : "{{ nid }}",
+          uid : "{{ uid }}"
+        },
+        function(data)
+        {
+            if (data.redirect) {
+              window.location="/prompt-google?target="+data.target+"&nid="+data.nid+"&uid="+data.uid;
+              return;
+            }
+            else if (data.invalid) {
+              return;
+            }
+
+            console.log(data);
+
+            $("#current_song_title").text(data.name);
+            $("#current_artist_name").text(data.artist_name);
+            $("#current_album_name").text(data.album_name);
+            document.getElementById("current_album_art").src = data.image_url;
+            {% if cur_network.is_admin %}
+              document.getElementById("player").src = data.audio_url;
+            {% endif %}
+        });
+  }
+
 </script>
 
 <div style = "text-align:right ">
@@ -59,36 +126,28 @@
   <div class="pusher">
     <div class="ui basic segment">
       <div class="ui card centered">
-  <div class="image">
-    <img id="current_album_art" src="">
-  </div>
-  <div class="content">
-      <a class = "header" id="current_song_title">No music playing right now</span>
-    <div class="description">
-      <span id="current_artist_name"></span> 
-      <p></p>
-      <span id="current_album_name"></span>
-      Album
-      <i class="left floated thumbs down icon"></i>
-      <i class="right floated thumbs up icon"></i>
+        <div class="image">
+          <img id="current_album_art">
+        </div>
+        <div class="content">
+          <a class = "header" id="current_song_title">No music playing right now</a>
+          <div class="description">
+            <span id="current_artist_name"></span> 
+            <br>
+            <span id="current_album_name"></span>
+            <i class="left floated thumbs down icon"></i>
+            <i class="right floated thumbs up icon"></i>
 
-  </div>
-</form>
+          </div>
 
-  <div class="extra content">
-    <a>
-      Music progress bar
-    </a>
-  </div>
-</div>
+        </div>
+      </div>
     </div>
   </div>
-</div>
 
 {% if cur_network.is_admin %}
 <div class = "play music centered">
-  <audio id="player" controls="controls">
-  <source src="" type="audio/mpeg" />
+  <audio id="player" controls="controls" autoplay="true" onended="nextSong()">
 Your browser does not support the audio element.
 </audio>
 </div>
