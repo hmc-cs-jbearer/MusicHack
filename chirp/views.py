@@ -48,7 +48,7 @@ def choose_network():
         'id' : one_id
     } for one_id in user_networks.keys()]
 
-    return render_template("user.html", network_id = network_id, user_networks=networks, uid=uid)
+    return render_template("user.html", network_id = nid, user_networks=networks, uid=uid)
 
 @app.route('/user')
 def user():
@@ -97,7 +97,7 @@ def search():
 
     query = request.args.get("query")
     uid = request.args.get("uid")
-    nid = reqeust.args.get("nid")
+    nid = request.args.get("nid")
 
     if not google:
         return render_template("login-google.html", target_url="/search?query=" + query)
@@ -131,14 +131,24 @@ def add_to_queue():
     uid = request.form.get('uid')
     nid = request.form.get('nid')
 
-    points = firebase.get('/users/' + uid + '/networks/' + nid + '/points')
+    points = firebase.get('/users/' + uid + '/networks/' + nid + '/points', None)
     cost = get_song_cost(song_id)
     if points < cost:
         return render_template('unauthoried.html', reason="You can't afford that song!")
 
-    firebase.put('/users/' + uid + '/networks/' + nid + '/points', points - cost)
-    back_id = firebase.get('/networks/' + nid + '/queue/back')
-    firebase.put('/networks/' + nid + '/queue/' + back_id + '/next', song_id)
+    queue = firebase.get('/networks/' + nid + '/queue', None)
+    back_id = queue['back']
+    if back_id:
+        queue[back_id]['next'] = song_id
+        queue[song_id]['requester'] = uid
+        queue['back'] = song_id
+    else:
+        # Empty queue
+        queue['front'] = song_id
+        queue['back'] = song_id
+        queue[song_id]['requester'] = uid
+
+    firebase.put('/networks/' + nid + '/queue', queue)
 
     return render_template('user.html', uid=uid)
 
