@@ -25,7 +25,6 @@ var audioNeedsSrc = true;
               return;
             }
 
-            console.log(data);
 
             $("#current_song_title").text(data.name);
             $("#current_artist_name").text(data.artist_name);
@@ -59,8 +58,6 @@ var audioNeedsSrc = true;
               return;
             }
 
-            console.log(data);
-
             $("#current_song_title").text(data.name);
             $("#current_artist_name").text(data.artist_name);
             $("#current_album_name").text(data.album_name);
@@ -81,8 +78,8 @@ var audioNeedsSrc = true;
             uid : "{{ uid }}"
         },
         function(data) {
-            //$('input[name="jqtestlabel"]').value = data;
-            $("#jqtestlabel").text(data.result);
+            if (data.invalid) return;
+            document.getElementById("coins").innerHTML=data.newCount + "<i class=\"database icon\"></i>";
         });
 
   }
@@ -239,8 +236,10 @@ Your browser does not support the audio element.
 </div>
 
 {% endif %}
-<div style = "text-align: right">
-  <h2 style="position: fixed; bottom: 0; width:75%"> {{cur_network.coins}} <i class = "database icon"></i></h2>
-</div>
+
+<label class="ui label" id="coins">
+  {{cur_network.coins}}
+  <i class="database icon"></i>
+</label>
 
 {% endblock %}

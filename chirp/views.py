@@ -114,8 +114,6 @@ def choose_network():
 
     network=user_networks[nid]
 
-    print network
-
     return render_template("user.html", nid=nid, cur_network=network, user_networks=networks, uid=uid)
 
 @app.route('/user')
@@ -377,7 +375,7 @@ def upvote():
         keys = upvoters.keys()
         for key in keys:
             if uid == key:
-                return jsonify({uid: 2})
+                return jsonify({'invalid': True})
 
 
     # get requester
@@ -393,7 +391,7 @@ def upvote():
     # adds the userid to the song (hopefully)
     firebase.put(queuePath + song_id + "/upvotes/", uid, "hello")
     
-    return jsonify({uid: 2})
+    return jsonify({"newCount": int(numCoins) + 1})
     
 
 def get_song_cost(song_id):
