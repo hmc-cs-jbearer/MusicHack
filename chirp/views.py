@@ -34,7 +34,7 @@ def create_account():
 @app.route('/user')
 def user():
     art = "/images/avatar2/large/kristy.png"
-    return render_template("user.html")
+    return render_template("user.html", admin = "true")
 
 @app.route('/login-google', methods=['POST'])
 def login_google():

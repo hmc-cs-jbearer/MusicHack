@@ -1,32 +1,73 @@
-{% extends "base.html" %} {% block title %}Yelp!{% endblock %}
+{% extends "base.html" %} {% block title %}Welcome{% endblock %}
 
 {% block body %}
+
+<div style = "text-align:right ">
+  <a href="/new-network"> <u>Create new network</u> </a>
+  <a href="/"><u>Logout</u> </a>
+
+  {% if admin == "true" %}
+  <a href="/add-user"> <u>Add users to network</u> </a>
+  {% endif %}
+</div>
+
 <form action="/search">
   <div class="ui huge icon input">
     <i class="search icon"></i>
-    <input name="search for song" type="text" placeholder="Search...">
+    <input name="search for song" type="text" placeholder="Search for a song... ">
   </div>
 </form>
 
-<div class="ui card">
+<div class="ui bottom">
+  <div class="ui visible inverted vertical sidebar menu">
+    <a class="item">
+      <i class="feed icon"></i>
+      Networks
+    </a>
+    <a class="item">
+      Network 1
+    </a>
+    <a class="item">
+      Network 2
+    </a>
+  </div>
+  <div class="pusher">
+    <div class="ui basic segment">
+      <div class="ui card centered">
   <div class="image">
-    <img src="/images/avatar2/large/kristy.png">
+    <img src="http://2.bp.blogspot.com/-g7IHhjRsF9s/UVYHuj9JkUI/AAAAAAAAAdM/cU9UfIuNg1I/s1600/339_c_w_450_h_450.jpg">
   </div>
   <div class="content">
-    <a class="header">Kristy</a>
+    <a class="header">Song name</a>
     <div class="meta">
-      <span class="date">Joined in 2013</span>
+      <span class="date">Artist</span>
     </div>
     <div class="description">
-      Kristy is an art director living in New York.
+      Album
+      <i class="left floated thumbs down icon"></i>
+      <i class="right floated thumbs up icon"></i>
     </div>
+    <div class 
   </div>
   <div class="extra content">
     <a>
-      <i class="user icon"></i>
-      22 Friends
+      Music progress bar
     </a>
   </div>
 </div>
+    </div>
+  </div>
+</div>
+
+{% if admin == "true" %}
+<div class = "play music centered">
+  <audio controls="controls">
+  <source src="track.mp3" type="audio/mpeg" />
+Your browser does not support the audio element.
+</audio>
+</div>
+
+{% endif %}
+
 
 {% endblock %}
