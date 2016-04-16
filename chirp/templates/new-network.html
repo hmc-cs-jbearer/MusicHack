@@ -1,0 +1,15 @@
+{% extends "base.html" %} {% block title %}Yelp!{% endblock %} {% block body %}
+
+<div class="ui form segment">
+  <p>Please enter the network's name</p>
+    <div class="field">
+      <label>Network</label>
+      <input placeholder="WIBSTR" id="email" type="text">
+    </div>
+  <div class="inline field">
+  <div>
+  <button onclick="check()"> Add Network </button>
+  <div class="ui error message"></div>
+</div>
+
+{% endblock %}

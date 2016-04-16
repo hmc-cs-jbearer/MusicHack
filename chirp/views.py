@@ -15,10 +15,15 @@ google = None
 def login():
     return render_template("login.html")
 
+@app.route('/new-network')
+def new_newtork():
+	return render_template("new-network.html")
+
 @app.route('/forgot-password')
 def forgot_password():
 	return render_template("forgot-password.html")
 
+<<<<<<< HEAD
 @app.route('/add-user')
 def add_user():
     return render_template("add-user.html")
@@ -26,6 +31,12 @@ def add_user():
 @app.route('/create-account')
 def create_account():
     return render_template("register.html")
+=======
+@app.route('/user')
+def user():
+	art = "/images/avatar2/large/kristy.png"
+	return render_template("user.html")
+>>>>>>> 4e9b446f8dd70cafa0ee978fe7086a70ffe9b31c
 
 @app.route('/search')
 def search():
