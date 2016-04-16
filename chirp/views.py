@@ -36,10 +36,27 @@ def add_user():
 def create_account():
     return render_template("register.html")
     
+@app.route('/choose-network')
+def choose_network():
+    uid = request.args.get('uid')
+    nid = request.args.get('nid')
+    
+    users = firebase.get("/users", None)
+    user_networks = users[uid]["networks"]
+    networks = [{
+        'name' : user_networks[nid]['name'],
+        'id' : one_id
+    } for one_id in user_networks.keys()]
+
+    return render_template("user.html", network_id = network_id, user_networks=networks, uid=uid)
+
 @app.route('/user')
 def user():
-    art = "/images/avatar2/large/kristy.png"
-    return render_template("user.html", admin = "true")
+    uid = request.args.get('uid')
+    nid = firebase.get('/users/' + uid + '/networks', None).keys()[0]
+    amdin = firebase.get('/users/' + uid + '/networks/' + nid + '/is_admin', None)
+
+    return redirect("/choose-network?uid="+uid+"&nid="+nid)
 
 @app.route('/upload-user', methods=["POST"])
 def uploud_user():
@@ -54,7 +71,6 @@ def uploud_user():
         })
         
     return True
-
 
 @app.route('/login-google', methods=['POST'])
 def login_google():
