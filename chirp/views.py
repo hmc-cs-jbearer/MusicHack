@@ -141,6 +141,12 @@ def add_to_queue():
         return render_template('unauthoried.html', reason="You can't afford that song!")
 
     queue = firebase.get('/networks/' + nid + '/queue', None)
+
+    if not queue:
+        # create empty queue
+        queue['front'] = None
+        queue['back'] = None
+
     back_id = queue['back']
     if back_id:
         queue[back_id]['next'] = song_id
