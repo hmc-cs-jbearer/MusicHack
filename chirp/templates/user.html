@@ -7,7 +7,7 @@
   <a href="/new-network"> <u>Create new network</u> </a>
   <a href="/"><u>Logout</u> </a>
 
-  {% if network_id.is_admin %}
+  {% if network_id.is_admin == 'True' %}
   <a href="/add-user"> <u>Add users to network</u> </a>
   {% endif %}
 </div>
@@ -28,9 +28,11 @@
     </a>
 
     {% for network in user_networks %}
+
     <a class="item">
-      <button class = "fluid ui button" action="/choose-network?network_id={{network.id}}"> {{network.name}}</button>
+      <button class = "fluid ui button" href="/choose-network?network_id={{network}}" type> {{network.name}}</button>
     </a>
+
     {% endfor %}
 
   </div>
