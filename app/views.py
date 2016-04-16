@@ -8,3 +8,7 @@ from app import app
 
 firebase = firebase.FirebaseApplication('https://musichack16.firebaseio.com/',
                                         None)
+
+@app.route('/')
+def login():
+	return render_template("login.html")
