@@ -336,5 +336,18 @@ def get_next_song():
     print data
     return jsonify(data)
 
+@app.route("/switch-google", methods=["POST"])
+def switch_google():
+    global google
+
+    if google:
+        google.logout()
+        google=None
+
+    uid = request.form.get('uid')
+    nid = request.form.get('nid')
+
+    return redirect('/user?uid='+uid+'&nid='+nid)
+
 def get_song_cost(song_id):
     return 1

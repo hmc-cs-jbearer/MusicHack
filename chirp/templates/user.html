@@ -91,6 +91,14 @@ var audioNeedsSrc = true;
 
   <a href="/"><button type="button">Logout</button></a>
 
+  <form action="/switch-google" method="post">
+    <input type="hidden" name="uid" value="{{ uid }}">
+    <input type="hidden" name="nid" value="{{ nid }}">
+    <a class="item">
+      <button type="submit"> Switch Google accounts </button>
+    </a>
+  </form>
+
   {% if cur_network.is_admin %}
   <a href="/add-user"><button type="button">Add a user</button></a>
 
