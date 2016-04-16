@@ -15,6 +15,19 @@ google = None
 def login():
     return render_template("login.html")
 
+@app.route('/new-network')
+def new_newtork():
+    return render_template("new-network.html")
+
+@app.route('/forgot-password')
+def forgot_password():
+    return render_template("forgot-password.html")
+
+@app.route('/user')
+def user():
+    art = "/images/avatar2/large/kristy.png"
+    return render_template("user.html")
+
 @app.route('/login-google', methods=['POST'])
 def login_google():
     '''
