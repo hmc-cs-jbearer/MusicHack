@@ -13,8 +13,7 @@ google = None
 
 @app.route('/')
 def login():
-    #return render_template("login.html")
-    return redirect("/search?query=warehouse")
+    return render_template("login.html")
 
 @app.route('/new-network')
 def new_newtork():
@@ -80,3 +79,16 @@ def search():
     } for track in [result['track'] for result in song_results]]
 
     return render_template("search-results.html", song_results=songs)
+
+@app.route('/current-song')
+def get_current_song():
+    '''
+    Get a dictionary representing the currently playing song on the given network.
+    Returns None if no song is currently playing
+    '''
+    network_id = request.args.get('network_id')
+    song_id = firebase.get("/networks/" + network_id + "/queue/front", None)
+    if song_id:
+        return firebase.get("/networks/" + network_id + "queue/" + song_id, 'data')
+    else:
+        return None
