@@ -1,4 +1,4 @@
-{% extends "base.html" %} {% block title %}Yelp!{% endblock %} {% block body %}
+{% extends "base.html" %} {% block title %}Juke!{% endblock %} {% block body %}
 
 <script language="javascript">
     function check() { //create new acct in firebase
@@ -20,7 +20,7 @@
 </script>
 
 <div class="ui form segment">
-  <p>Login!</p>
+  <p>Welcome to Juke!</p>
     <div class="field">
       <label>Username</label>
       <input placeholder="Username" id="username" type="text">
@@ -31,8 +31,8 @@
     </div>
   <div class="inline field">
   <div>
-  <button onclick="check()"> Sign in </button>
-  <button onclick="check()"> Create account</button>
+  <a href="/user"><button type="button">Sign in</button></a>
+  <a href="/create-account"><button type="button">Create new account</button></a>
   <div class="ui error message"></div>
   <a href="/forgot-password"> Forgot Password? </a>
 </div>

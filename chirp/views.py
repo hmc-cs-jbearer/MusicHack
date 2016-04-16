@@ -24,6 +24,14 @@ def new_newtork():
 def forgot_password():
     return render_template("forgot-password.html")
 
+@app.route('/add-user')
+def add_user():
+    return render_template("add-user.html")
+
+@app.route('/create-account')
+def create_account():
+    return render_template("register.html")
+    
 @app.route('/user')
 def user():
     art = "/images/avatar2/large/kristy.png"
