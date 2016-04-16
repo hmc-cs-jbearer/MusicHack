@@ -2,7 +2,9 @@
 
 {% block body %}
 
-<script type=text/javascript src="{{url_for('static', filename='display-current-song.js') }}"></script>"
+<script type="text/javascript">
+  {% include "display-current-song.js" %}  
+</script>
 
 <div style = "text-align:right ">
   <form action="/new-network" method="post">
@@ -85,8 +87,8 @@
 
 {% if cur_network.is_admin %}
 <div class = "play music centered">
-  <audio controls="controls">
-  <source src="track.mp3" type="audio/mpeg" />
+  <audio id="player" controls="controls">
+  <source src="" type="audio/mpeg" />
 Your browser does not support the audio element.
 </audio>
 </div>

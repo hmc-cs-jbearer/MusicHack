@@ -196,36 +196,48 @@ def add_to_queue():
             'back' : None
         }
 
-    back_id = queue['back']
-    if back_id:
-        queue[back_id]['next'] = song_id
-        queue[song_id] = {
-            'requester' : uid
-        }
-        queue['back'] = song_id
-    else:
+    if not queue['back']:
         # Empty queue
         queue['front'] = song_id
         queue['back'] = song_id
         queue[song_id] = {
             'requester' : uid
         }
+    else:
+        back_id = queue['back']
+        queue[back_id]['next'] = song_id
+
+    queue[song_id] = {
+        'requester' : uid,
+        'data' : {
+            'name' : request.form.get('song_name'),
+            'artist_name' : request.form.get('artist_name'),
+            'album_name' : request.form.get('album_name'),
+            'image_url' : request.form.get('image_url')
+        }
+    }
+    queue['back'] = song_id
 
     firebase.put('/networks/' + nid, 'queue', queue)
     firebase.put('/users/' + uid + '/networks/' + nid, 'coins', coins - 1)
 
     return redirect('/user?uid='+uid+'&nid='+nid)
 
-@app.route('/current-song')
+@app.route('/get-current-song')
 def get_current_song():
     '''
     Get a dictionary representing the currently playing song on the given network.
     Returns None if no song is currently playing
     '''
-    network_id = request.args.get('network_id')
-    song_id = firebase.get("/networks/" + network_id + "/queue/front", None)
+    nid = request.args.get('nid')
+
+    queue = firebase.get("/networks/" + nid, 'queue')
+    song_id = queue['front']
+    data = queue[song_id]['data']
+    data['audio_url'] = google.get_stream_url(song_id)
+
     if song_id:
-        return firebase.get("/networks/" + network_id + "queue/" + song_id, 'data')
+        return data
     else:
         return None
 
