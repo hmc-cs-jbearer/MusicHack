@@ -1,5 +1,9 @@
 {% extends "base.html" %} {% block title %}Juke!{% endblock %} {% block body %}
 
+{% if error %}
+<p style="color:red">Invalid username or password.</p>
+{% endif %}
+
 <script language="javascript">
     function check() { //create new acct in firebase
         //document.write(document.getElementById("name").value);
@@ -9,12 +13,14 @@
          password : document.getElementById("password").value
        }, function(error, userData) {
       if (error) {
-      console.log("Error creating user:", error);
-      } else {
-      console.log("Successfully authenticated user account with uid:", userData.uid);
-      window.location = '/user?uid=' + userData.uid;
-  }
-        });
+
+          window.location = '/login-error';
+          console.log("Error creating user:", error);
+          } else {
+            console.log("Successfully authenticated user account with uid:", userData.uid);
+            window.location = '/user?uid=' + userData.uid;
+      }
+      });
         
         
       }
