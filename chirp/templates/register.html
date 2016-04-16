@@ -25,28 +25,27 @@
               console.log("Error creating user:", error);
           }
       } else {
-          ref.set({
-            users: userData.uid
-          });
+          
           var users = ref.child("users");
           var thisUser = users.child(userData.uid);
 
           //var userid = userData.uid;
           thisUser.set({
               name: document.getElementById("name").value,
-              coins: 3
+              coins: 3,
+              networks: {
+                test_network: {
+                  name: "West",
+                  coins: 210,
+                  is_admin: "true"
+                }
+              }
             }
           ); //end set
         } //end else
       });
-
-
-        //document.write("hello");
-        
-        
-        
-        
-        //window.location = '/user?user_id=' + userData.uid;
+  
+      window.location = '/user?uid=' + userData.uid;
         
       }
 </script>
