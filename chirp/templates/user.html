@@ -5,7 +5,13 @@
 <script type=text/javascript src="{{url_for('static', filename='display-current-song.js') }}"></script>"
 
 <div style = "text-align:right ">
-  <a href="/new-network"> <u>Create new network</u> </a>
+  <form action="/new-network" method="post">
+    <input type="hidden" name="uid" value="{{ uid }}">
+    <a class="item">
+      <button class = "fluid ui button" type="submit"> Create new network </button>
+    </a>
+  </form>
+
   <a href="/"><u>Logout</u> </a>
 
   {% if cur_network.is_admin %}

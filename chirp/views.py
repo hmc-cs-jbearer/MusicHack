@@ -19,9 +19,28 @@ def login():
 def login_error():
     return render_template("login.html", error=True)
 
-@app.route('/new-network')
+@app.route('/new-network', methods=['POST'])
 def new_newtork():
-    return render_template("new-network.html")
+    uid = request.form.get('uid')
+    return render_template("new-network.html", uid=uid)
+
+@app.route('/add-network', methods=['POST'])
+def add_network():
+    uid = request.form.get('uid')
+    network_name = request.form.get('name')
+
+    firebase.put('/', network_name, {
+        "admin": uid
+        })
+
+    firebase.put('/users/' + uid + '/networks/', network_name,
+        {
+        "name": network_name,
+        "coins": 210,
+        "is_admin": "true",
+        })
+
+    return redirect('/user?uid=' + uid)
 
 @app.route('/create-account')
 def register():
