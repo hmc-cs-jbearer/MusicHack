@@ -42,7 +42,7 @@ def user():
     nid = firebase.get('/users/' + uid + '/networks', None).keys()[0]
     amdin = firebase.get('/users/' + uid + '/networks/' + nid + '/is_admin', None)
 
-    return render_template("user.html", uid=uid, nid=nid, admin = admin)
+    return redirect("/choose-network?uid="+uid+"&nid="+nid)
 
 @app.route('/upload-user', methods=["POST"])
 def uploud_user():
