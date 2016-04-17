@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import os
 
 from firebase import firebase
@@ -5,19 +7,17 @@ from flask import render_template, request, redirect, url_for, jsonify
 from gmusicapi import Mobileclient, CallFailure
 
 from chirp import app
+from chirp import log_file
 
 firebase = firebase.FirebaseApplication('https://musichack16.firebaseio.com/',
                                         None)
 
 google = None
 
-# Line buffered so if the app closes with keyboard interrupt, the buffer still gets flushed
-log_file = open('log.txt', 'w', 1)
-
 @app.route('/')
 def login():
+    log("home page 2")
     return render_template("login.html")
-
 
 @app.route('/login-error')
 def login_error():
@@ -418,4 +418,5 @@ def get_song_cost(song_id):
     return 1
 
 def log(message):
-    log_file.write(message + '\n')
+    print(message)
+    print(message, file=log_file)
