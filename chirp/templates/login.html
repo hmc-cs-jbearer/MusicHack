@@ -8,18 +8,23 @@
     function check() { //create new acct in firebase
         //document.write(document.getElementById("name").value);
         var ref = new Firebase("https://musichack16.firebaseio.com");
-        ref.authWithPassword({
-         email    : document.getElementById("username").value,
-         password : document.getElementById("password").value
-       }, function(error, userData) {
-      if (error) {
-
-          window.location = '/login-error';
-          console.log("Error creating user:", error);
+        ref.authWithOAuthPopup("google", function(error, authData){
+          if (error) {
+              window.location = '/login-error';
+              console.log("Error creating user:", error);
           } else {
             console.log("Successfully authenticated user account with uid:", userData.uid);
-            window.location = '/user?uid=' + userData.uid;
-      }
+            //window.location = '/user?uid=' + userData.uid;
+            googleToken=authData.google.accessToken;
+
+            $.ajax({
+               url: "https://www.googleapis.com/sj/v1beta1/tracks",
+               type: "GET",
+               beforeSend: function(xhr){xhr.setRequestHeader('Authorization: GoogleLogin auth', googleToken);},
+               success: function() { alert('Success!'); },
+               error: function() {alert('Error!')}
+            });
+          }
       });
         
         
