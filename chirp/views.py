@@ -300,8 +300,13 @@ def get_current_song():
         data = queue[song_id]['data']
 
         log('Requesting audio URL for ' + data['name'] + ' from get_current_song.')
-        data['audio_url'] = google.get_stream_url(song_id)
-        log('Received audio URL for ' + data['name'] + ' in get_current_song.')
+        
+        try:
+            data['audio_url'] = google.get_stream_url(song_id)
+            log('Received audio URL for ' + data['name'] + ' in get_current_song.')
+        except CallFailure:
+            log('Error in getting audio for ' + data['name'] + ' in get_current_song.')
+            quit()
 
         return jsonify(data)
 
@@ -349,8 +354,13 @@ def get_next_song():
     data = queue[queue['front']]['data']
 
     log('Requesting audio URL for ' + data['name'] + ' from get_next_song.')
-    data['audio_url'] = google.get_stream_url(queue['front'])
-    log('Received audio URL for ' + data['name'] + ' in get_next_song.')
+    
+    try:
+        data['audio_url'] = google.get_stream_url(queue['front'])
+        log('Received audio URL for ' + data['name'] + ' in get_next_song.')
+    except CallFailure:
+        log('Error in getting audio for ' + data['name'] + ' in get_next_song.')
+        quit()
 
     return jsonify(data)
 
