@@ -11,6 +11,9 @@ firebase = firebase.FirebaseApplication('https://musichack16.firebaseio.com/',
 
 google = None
 
+# Line buffered so if the app closes with keyboard interrupt, the buffer still gets flushed
+log_file = open('log.txt', 'w', 1)
+
 @app.route('/')
 def login():
     return render_template("login.html")
@@ -168,6 +171,7 @@ def login_google():
         target_url += prefix +"uid=" + uid
 
     if google.login(email, password, Mobileclient.FROM_MAC_ADDRESS):
+        log('logged into google account for ' + email)
         return redirect(target_url)
     else:
         return render_template("login-google.html", target_url=target_url, error=True)
@@ -188,17 +192,15 @@ def search():
     if not nid:
         nid = request.args.get("nid")
 
-    print query
-    print uid
-    print nid
-
     if not google:
         return render_template("login-google.html", target_url="/search?query=" + query, uid=uid, nid=nid)
 
     song_results = []
     try:
+        log('Searching all access for songs')
         song_results = google.search_all_access(query, max_results=results_per_page)['song_hits']
     except CallFailure:
+        log('No all access account, searching user library')
         song_results = google.get_all_songs(incremental=True)[:results_per_page]
 
     songs = [{
@@ -296,9 +298,13 @@ def get_current_song():
     song_id = queue['front']
     if song_id:
         data = queue[song_id]['data']
+
+        log('Requesting audio URL for ' + data['name'] + ' from get_current_song.')
         data['audio_url'] = google.get_stream_url(song_id)
-        print data
+        log('Received audio URL for ' + data['name'] + ' in get_current_song.')
+
         return jsonify(data)
+
     else:
         return jsonify({'invalid' : True})
 
@@ -341,8 +347,11 @@ def get_next_song():
         })
 
     data = queue[queue['front']]['data']
+
+    log('Requesting audio URL for ' + data['name'] + ' from get_next_song.')
     data['audio_url'] = google.get_stream_url(queue['front'])
-    print data
+    log('Received audio URL for ' + data['name'] + ' in get_next_song.')
+
     return jsonify(data)
 
 @app.route("/switch-google", methods=["POST"])
@@ -350,6 +359,7 @@ def switch_google():
     global google
 
     if google:
+        log('Logging out of Google Play account')
         google.logout()
         google=None
 
@@ -396,3 +406,6 @@ def upvote():
 
 def get_song_cost(song_id):
     return 1
+
+def log(message):
+    log_file.write(message + '\n')
