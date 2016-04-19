@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import os
 
 from firebase import firebase
@@ -5,6 +7,7 @@ from flask import render_template, request, redirect, url_for, jsonify
 from gmusicapi import Mobileclient, CallFailure
 
 from chirp import app
+from chirp import log_file
 
 import re
 
@@ -15,8 +18,8 @@ google = None
 
 @app.route('/')
 def login():
+    log("home page 2")
     return render_template("login.html")
-
 
 @app.route('/login-error')
 def login_error():
@@ -37,7 +40,7 @@ def add_network():
     uid = request.form.get('uid')
     network_name = request.form.get('name')
 
-    firebase.put('/', network_name, {
+    firebase.put('/networks', network_name, {
         "admin": uid
         })
 
@@ -76,12 +79,18 @@ def username_exists():
 @app.route('/invalid-email')
 def invalid_email():
     return render_template("register.html", error="invalid email")
+
+@app.route('/passwords-dont-match')
+def passwords_dont_match():
+    return render_template("register.html", error="passwords dont match")
+
 ####
 
 
 @app.route('/forgot-password')
 def forgot_password():
     return render_template("forgot-password.html")
+
 
 @app.route('/add-user')
 def add_user():
@@ -109,8 +118,6 @@ def choose_network():
     } for one_id in user_networks.keys()]
 
     network=user_networks[nid]
-
-    print network
 
     return render_template("user.html", nid=nid, cur_network=network, user_networks=networks, uid=uid)
 
@@ -166,6 +173,7 @@ def login_google():
         target_url += prefix +"uid=" + uid
 
     if google.login(email, password, Mobileclient.FROM_MAC_ADDRESS):
+        log('logged into google account for ' + email)
         return redirect(target_url)
     else:
         return render_template("login-google.html", target_url=target_url, error=True)
@@ -186,17 +194,15 @@ def search():
     if not nid:
         nid = request.args.get("nid")
 
-    print query
-    print uid
-    print nid
-
     if not google:
         return render_template("login-google.html", target_url="/search?query=" + query, uid=uid, nid=nid)
 
     song_results = []
     try:
+        log('Searching all access for songs')
         song_results = google.search_all_access(query, max_results=results_per_page)['song_hits']
     except CallFailure:
+        log('No all access account, searching user library')
         song_results = google.get_all_songs(incremental=True)[:results_per_page]
 
     songs = [{
@@ -294,9 +300,17 @@ def get_current_song():
     song_id = queue['front']
     if song_id:
         data = queue[song_id]['data']
-        data['audio_url'] = google.get_stream_url(song_id, validMobileDeviceID())
-        print data
+        log('Requesting audio URL for ' + data['name'] + ' from get_current_song.')
+        
+        try:
+            data['audio_url'] = google.get_stream_url(song_id)
+            log('Received audio URL for ' + data['name'] + ' in get_current_song.')
+        except CallFailure:
+            log('Error in getting audio for ' + data['name'] + ' in get_current_song.')
+            quit()
+
         return jsonify(data)
+
     else:
         return jsonify({'invalid' : True})
 
@@ -339,8 +353,16 @@ def get_next_song():
         })
 
     data = queue[queue['front']]['data']
-    data['audio_url'] = google.get_stream_url(queue['front'], validMobileDeviceID())
-    print data
+
+    log('Requesting audio URL for ' + data['name'] + ' from get_next_song.')
+    
+    try:
+        data['audio_url'] = google.get_stream_url(queue['front'])
+        log('Received audio URL for ' + data['name'] + ' in get_next_song.')
+    except CallFailure:
+        log('Error in getting audio for ' + data['name'] + ' in get_next_song.')
+        quit()
+
     return jsonify(data)
 
 @app.route("/switch-google", methods=["POST"])
@@ -348,6 +370,7 @@ def switch_google():
     global google
 
     if google:
+        log('Logging out of Google Play account')
         google.logout()
         google=None
 
@@ -355,6 +378,42 @@ def switch_google():
     nid = request.form.get('nid')
 
     return redirect('/user?uid='+uid+'&nid='+nid)
+
+@app.route('/upvote')
+def upvote():
+    nid = request.args.get("nid")
+    uid = request.args.get("uid") 
+
+    queuePath = "/networks/" + nid + "/queue/"
+
+    # get song from the front of the queue
+    song_id = firebase.get(queuePath, "front")
+
+    # make sure the user can only upvote the song once
+    upvoters = firebase.get(queuePath + song_id, "upvotes")
+
+    if upvoters:
+        keys = upvoters.keys()
+        for key in keys:
+            if uid == key:
+                return jsonify({'invalid': True})
+
+
+    # get requester
+    requester = firebase.get(queuePath + song_id + "/", "requester")
+    # increments the number of coins (hopefully)
+    
+    nidPath = "/users/" + requester + "/networks/" + nid + "/"
+
+    numCoins = firebase.get(nidPath, "coins")
+
+    firebase.put(nidPath, "coins", int(numCoins) + 1)
+
+    # adds the userid to the song (hopefully)
+    firebase.put(queuePath + song_id + "/upvotes/", uid, "hello")
+    
+    return jsonify({"newCount": int(numCoins) + 1})
+    
 
 def get_song_cost(song_id):
     return 1
@@ -371,15 +430,18 @@ def validMobileDeviceID():
     #Each element should have one subgroup, corresponding to the part of the
     #format to use as the device ID. For example, Android IDs drop the '0x'
     #at the beginning, so the rest of the format is subgrouped.
-    DEVICE_FORMATS = [re.compile(r"0x(.{16})")] #TODO: add more formats
+    id_formats = [re.compile(r"0x(.{16})")]
 
-    print 'hi'
     devices = google.get_registered_devices()
     for device in devices:
-        for f in DEVICE_FORMATS:
-            match = re.match(f, device['id'])
+        for form in id_formats:
+            match = re.match(form, device['id'])
             if match:
                 return match.group(1)
 
-    print "hi"
     return None
+
+def log(message):
+    print(message)
+    print(message, file=log_file)
+
