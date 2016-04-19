@@ -6,6 +6,8 @@ from gmusicapi import Mobileclient, CallFailure
 
 from chirp import app
 
+import re
+
 firebase = firebase.FirebaseApplication('https://musichack16.firebaseio.com/',
                                         None)
 
@@ -292,7 +294,7 @@ def get_current_song():
     song_id = queue['front']
     if song_id:
         data = queue[song_id]['data']
-        data['audio_url'] = google.get_stream_url(song_id)
+        data['audio_url'] = google.get_stream_url(song_id, validMobileDeviceID())
         print data
         return jsonify(data)
     else:
@@ -337,7 +339,7 @@ def get_next_song():
         })
 
     data = queue[queue['front']]['data']
-    data['audio_url'] = google.get_stream_url(queue['front'])
+    data['audio_url'] = google.get_stream_url(queue['front'], validMobileDeviceID())
     print data
     return jsonify(data)
 
@@ -356,3 +358,28 @@ def switch_google():
 
 def get_song_cost(song_id):
     return 1
+
+def validMobileDeviceID():
+    '''
+    Trying to get a stream URL from a desktop or laptop causes a 403 error.
+    This function returns a mobile device from which it is possible to
+    obtain a URL. If no such devices is regesterd to the account, returns
+    None.
+    '''
+
+    #Each element should be a RegEx to match a particular valid format.
+    #Each element should have one subgroup, corresponding to the part of the
+    #format to use as the device ID. For example, Android IDs drop the '0x'
+    #at the beginning, so the rest of the format is subgrouped.
+    DEVICE_FORMATS = [re.compile(r"0x(.{16})")] #TODO: add more formats
+
+    print 'hi'
+    devices = google.get_registered_devices()
+    for device in devices:
+        for f in DEVICE_FORMATS:
+            match = re.match(f, device['id'])
+            if match:
+                return match.group(1)
+
+    print "hi"
+    return None
