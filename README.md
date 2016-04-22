@@ -1,9 +1,7 @@
 # MusicHack
 Virtual jukebox for the Spring '16 5c Hackathon
 
-# Dependencies 
-(or they will be once we actually write some code)
-* [gmusicapi](https://github.com/simon-weber/gmusicapi)
-* [Firebase](https://pypi.python.org/pypi/python-firebase/1.2)
-* [Flask](http://flask.pocoo.org/)
+Collaborative radio for communal speakers, such as in a dorm courtyard. Users can see information about currently playing music, upvote or downvote the current song, request a song using coins, and earn coins by having their song selections upvoted.
+
+Currently transitioning from a semi-working Hackathon prototype written in Python to a Node.js-based backend, since we can interface with Firebase more easily with Javascript.
 

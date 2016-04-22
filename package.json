@@ -1,0 +1,13 @@
+{
+	"name" : "juke",
+	"version" : "0.0.1",
+	"dependencies" : {
+		"express" : "4.13.4",
+		"firebase" : "2.4.2"
+	},
+
+	"repository" : {
+	   "type" : "git",
+	   "url" : "https://github.com/hmc-cs-jbearer/MusicHack.git"
+	 }
+}
