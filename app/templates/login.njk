@@ -1,16 +1,47 @@
-{% extends "base.html" %} {% block title %}Add user{% endblock %} {% block body %}
+{% extends "base.njk" %} {% block title %}Juke!{% endblock %} {% block body %}
+
+{% if error %}
+<p style="color:red">{{ error }}</p>
+{% endif %}
+
+<script language="javascript">
+    function check() { //create new acct in firebase
+        //document.write(document.getElementById("name").value);
+        var ref = new Firebase("https://musichack16.firebaseio.com");
+        ref.authWithPassword({
+         email    : document.getElementById("username").value,
+         password : document.getElementById("password").value
+       }, function(error, userData) {
+      if (error) {
+
+          window.location = '/login?continue={{ continue }}&error=Invalid+username+or+password.';
+          console.log("Error creating user:", error);
+          } else {
+            console.log("Successfully authenticated user account with uid:", userData.uid);
+            window.location = "{{ continue }}";
+      }
+      });
+        
+        
+      }
+</script>
 
 <div class="ui form segment">
-  <p>Add user to network</p>
+  <p>Welcome to Juke!</p>
     <div class="field">
       <label>Username</label>
       <input placeholder="Username" id="username" type="text">
     </div>
+    <div class="field">
+      <label>Password</label>
+      <input placeholder="Password" type="password" id="password">
+    </div>
   <div class="inline field">
   <div>
-  <button onclick="check()"> Add user </button>
-  <a href="/user"><button type="button">Back</button></a>
+  <button onclick="check()" type="button">Sign in</button>
+  <a href="/create-account"><button type="button">Create new account</button></a>
   <div class="ui error message"></div>
+  <a href="/forgot-password"> Forgot Password? </a>
 </div>
 
 <script type="text/javascript">
@@ -26,7 +57,7 @@ var ctx = myCanvas.getContext("2d");
 //first we clear the canvas
 ctx.clearRect(0,0,100,100);
 //setup the palette array
-var grayPalette = ["#aaaaaa","#bbbbbb","#cccccc","#dddddd","#eeeeee"];
+var grayPalette = ["#0072bb","#ff4c3b","#ffd034","#000000","#ffffff"];
 
 //create 10x10 squares
 for (i=0;i<10;i++){
@@ -64,5 +95,7 @@ function setDynamicBackground(){
 </script>
 </head>
 <body onload="setDynamicBackground()">
+
+
 
 {% endblock %}

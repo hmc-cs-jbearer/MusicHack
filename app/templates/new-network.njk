@@ -1,28 +1,18 @@
-{% extends "base.html" %}
+{% extends "base.njk" %} {% block title %}Add new network{% endblock %} {% block body %}
 
-{% block title %}Log in to Google Play{% endblock %}
-
-{% block body %}
-
-{% if error %}
-<p style="color:red">Invalid username or password.</p>
-{% endif %}
-
-<h1 class="ui header">Please log in to your Google Play account</h1>
-<form action="/login-google" method="post">
-	<div class="ui input">
-		<input type="text" name="email" placeholder="Email...">
-	</div>
-	<div class="ui input">
-		<input type="password" name="password" placeholder="Password...">
-	</div>
-	<input type="hidden" name="target_url" value="{{ target_url }}"/>
-	<input type="hidden" name="nid" value="{{ nid }}">
-	<input type="hidden" name="uid" value="{{ uid }}">
-	<button type="submit" class="ui button">
-		Log in
-	</button>
+<div class="ui form segment">
+<form action="/add-network" method="post">
+  <p>Please enter the network's name</p>
+    <div class="field">
+      <label>Network</label>
+      <input name="name" placeholder="WIBSTR" id="email" type="text">
+    </div>
+  <input type="hidden" name="uid" value="{{ uid }}">
+  <div class="inline field">
+  <button type="submit"> Add Network </button>
+</div>
 </form>
+</div>
 
 <script type="text/javascript">
 //create the canvas element

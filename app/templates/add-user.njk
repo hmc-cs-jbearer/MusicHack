@@ -1,16 +1,15 @@
-{% extends "base.html" %} {% block title %}Forgot password?{% endblock %} {% block body %}
+{% extends "base.njk" %} {% block title %}Add user{% endblock %} {% block body %}
 
 <div class="ui form segment">
-  <p>Please enter your email address</p>
+  <p>Add user to network</p>
     <div class="field">
-      <label>Email address</label>
-      <input placeholder="johndoe@example.com" id="email" type="text">
+      <label>Username</label>
+      <input placeholder="Username" id="username" type="text">
     </div>
   <div class="inline field">
   <div>
-
-  <button onclick="check()"> Reset password </button>
-  <a href="/"><button type="button">Back</button></a>
+  <button onclick="check()"> Add user </button>
+  <a href="/user"><button type="button">Back</button></a>
   <div class="ui error message"></div>
 </div>
 

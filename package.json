@@ -3,7 +3,9 @@
 	"version" : "0.0.1",
 	"dependencies" : {
 		"express" : "4.13.4",
-		"firebase" : "2.4.2"
+		"firebase" : "2.4.2",
+		"nunjucks" : "2.4.2",
+		"body-paresr" : "1.15.0"
 	},
 
 	"repository" : {

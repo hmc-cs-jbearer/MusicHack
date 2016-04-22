@@ -1,86 +1,85 @@
-{% extends "base.html" %} {% block title %}Welcome{% endblock %}
+{% extends "base.njk" %} {% block title %}Welcome{% endblock %}
 
 {% block body %}
 
 <script type="text/javascript">
 
-var audioNeedsSrc = true;
+  // Information about the user's login session
+  var user;
+
+  checkLogin(function(authData) {
+    user = authData;
+  });
+
+  var audioNeedsSrc = true;
 
   setInterval(
-  function()
-  {
+    function()
+    {
      $.getJSON(
-        $SCRIPT_ROOT + '/get-current-song',
-        {
-          nid : "{{ nid }}",
-          uid : "{{ uid }}"
-        },
-        function(data)
-        {
-            if (data.redirect) {
-              window.location="/prompt-google?target="+data.target+"&nid="+data.nid+"&uid="+data.uid;
-              return;
-            }
-            else if (data.invalid) {
-              return;
-            }
+      "/get-current-song",
+      {
+        nid : "{{ nid }}",
+        token : user.token
+      },
+      function(data)
+      {
+        if (data.invalid) {
+          return;
+        }
 
+        $("#current_song_title").text(data.name);
+        $("#current_artist_name").text(data.artist_name);
+        $("#current_album_name").text(data.album_name);
+        document.getElementById("current_album_art").src = data.image_url;
+        {% if cur_network.is_admin %}
+        if (audioNeedsSrc) {
+          document.getElementById("player").src = data.audio_url;
+          audioNeedsSrc = false;
+        }
 
-            $("#current_song_title").text(data.name);
-            $("#current_artist_name").text(data.artist_name);
-            $("#current_album_name").text(data.album_name);
-            document.getElementById("current_album_art").src = data.image_url;
-            {% if cur_network.is_admin %}
-              if (audioNeedsSrc) {
-              document.getElementById("player").src = data.audio_url;
-              audioNeedsSrc = false;
-            }
-            
-            {% endif %}
-        });
-  },
-  1000);
+        {% endif %}
+      });
+   },
+   1000);
 
   function nextSong() {
     $.getJSON(
-        $SCRIPT_ROOT + '/get-next-song',
-        {
-          nid : "{{ nid }}",
-          uid : "{{ uid }}"
-        },
-        function(data)
-        {
-            if (data.redirect) {
-              window.location="/prompt-google?target="+data.target+"&nid="+data.nid+"&uid="+data.uid;
-              return;
-            }
-            else if (data.invalid) {
-              return;
-            }
+      $SCRIPT_ROOT + '/get-next-song',
+      {
+        nid : "{{ nid }}",
+        uid : "{{ uid }}"
+      },
+      function(data)
+      {
+        if (data.redirect) {
+          window.location="/prompt-google?target="+data.target+"&nid="+data.nid+"&uid="+data.uid;
+          return;
+        }
+        else if (data.invalid) {
+          return;
+        }
 
-            $("#current_song_title").text(data.name);
-            $("#current_artist_name").text(data.artist_name);
-            $("#current_album_name").text(data.album_name);
-            document.getElementById("current_album_art").src = data.image_url;
-            {% if cur_network.is_admin %}
-              document.getElementById("player").src = data.audio_url;
-            {% endif %}
-        });
+        $("#current_song_title").text(data.name);
+        $("#current_artist_name").text(data.artist_name);
+        $("#current_album_name").text(data.album_name);
+        document.getElementById("current_album_art").src = data.image_url;
+        {% if cur_network.is_admin %}
+        document.getElementById("player").src = data.audio_url;
+        {% endif %}
+      });
   }
 
-</script>
-
-<script language=javascript> 
   function upvote() {
     $.getJSON($SCRIPT_ROOT + '/upvote',
-        {
-            nid : "{{ nid }}",
-            uid : "{{ uid }}"
-        },
-        function(data) {
-            if (data.invalid) return;
-            document.getElementById("coins").innerHTML=data.newCount + "<i class=\"database icon\"></i>";
-        });
+    {
+      nid : "{{ nid }}",
+      token : user.token
+    },
+    function(data) {
+      if (data.invalid) return;
+      document.getElementById("coins").innerHTML=data.newCount + "<i class=\"database icon\"></i>";
+    });
 
   }
 </script>
@@ -88,14 +87,12 @@ var audioNeedsSrc = true;
 <div style = "text-align:right ">
 
   <form action="/new-network" method="post">
-    <input type="hidden" name="uid" value="{{ uid }}">
     <a class="item">
       <button type="submit"> Create new network </button>
     </a>
   </form>
 
   <form action="/enter-network" method="post">
-    <input type="hidden" name="uid" value="{{ uid }}">
     <a class="item">
       <button type="submit"> Join a network </button>
     </a>
@@ -104,7 +101,6 @@ var audioNeedsSrc = true;
   <a href="/"><button type="button">Logout</button></a>
 
   <form action="/switch-google" method="post">
-    <input type="hidden" name="uid" value="{{ uid }}">
     <input type="hidden" name="nid" value="{{ nid }}">
     <a class="item">
       <button type="submit"> Switch Google accounts </button>
@@ -119,7 +115,6 @@ var audioNeedsSrc = true;
 
 <form action="/search" method="post">
 
-  <input name="uid" type="hidden" value="{{ uid }}">
   <input name="nid" type="hidden" value="{{ nid }}">
   <div class="ui huge icon input">
     <i class="search icon"></i>
@@ -137,11 +132,10 @@ var audioNeedsSrc = true;
     {% for network in user_networks %}
 
     <form action="/choose-network">
-    <input type="hidden" name="uid" value="{{ uid }}">
-    <input type="hidden" name="nid" value="{{ network.id }}">
-    <a class="item">
-      <button class = "fluid ui button" type="submit"> {{network.name}}</button>
-    </a>
+      <input type="hidden" name="nid" value="{{ network.id }}">
+      <a class="item">
+        <button class = "fluid ui button" type="submit"> {{network.name}}</button>
+      </a>
     </form>
 
     {% endfor %}
@@ -149,10 +143,10 @@ var audioNeedsSrc = true;
   </div>
 
   <div class = "ui centered label">
-  Music for {{ cur_network.name }}
+    Music for {{ cur_network.name }}
   </div>
 
-<script type="text/javascript">
+  <script type="text/javascript">
 //create the canvas element
 var myCanvas = document.createElement("canvas");
 
@@ -176,7 +170,7 @@ for (i=0;i<10;i++){
 
   //choose a random color from the palette
   var randomColorIndex = 
-    Math.round(Math.random() * (grayPalette.length-1));
+  Math.round(Math.random() * (grayPalette.length-1));
   ctx.fillStyle = grayPalette[randomColorIndex];
 
   //fill the rectangle with the selected color
@@ -188,7 +182,7 @@ for (i=0;i<10;i++){
 
   //indicating when finished drawing the rectangle
   ctx.closePath();
- }
+}
 }
 
 //this will run when the document has finished loading
@@ -198,7 +192,7 @@ function setDynamicBackground(){
 
   //set the dynamic image as the background
   document.body.style.background = 
-   "transparent url('"+imageDataURL+"') repeat";
+  "transparent url('"+imageDataURL+"') repeat";
 }
 </script>
 </head>
@@ -228,18 +222,18 @@ function setDynamicBackground(){
     </div>
   </div>
 
-{% if cur_network.is_admin %}
-<div class = "play music centered">
-  <audio id="player" controls="controls" autoplay="true" onended="nextSong()">
-Your browser does not support the audio element.
-</audio>
-</div>
+  {% if cur_network.is_admin %}
+  <div class = "play music centered">
+    <audio id="player" controls="controls" autoplay="true" onended="nextSong()">
+      Your browser does not support the audio element.
+    </audio>
+  </div>
 
-{% endif %}
+  {% endif %}
 
-<label class="ui label" id="coins">
-  {{cur_network.coins}}
-  <i class="database icon"></i>
-</label>
+  <label class="ui label" id="coins">
+    {{cur_network.coins}}
+    <i class="database icon"></i>
+  </label>
 
-{% endblock %}
+  {% endblock %}

@@ -1,15 +1,15 @@
-{% extends "base.html" %} {% block title %}Enter network{% endblock %} {% block body %}
+{% extends "base.njk" %} {% block title %}Join a network{% endblock %} {% block body %}
 
 <div class="ui form segment">
 <form action="/join-network" method="post">
-  <p>Please enter the network's name</p>
+  <p>Connect to a new network</p>
     <div class="field">
-      <label>Network</label>
+      <label>Enter the name of the network you would like to join</label>
       <input name="name" placeholder="WIBSTR" id="email" type="text">
     </div>
   <input type="hidden" name="uid" value="{{ uid }}">
   <div class="inline field">
-  <button type="submit"> Join Network </button>
+  <button type="submit"> Add Network </button>
 </div>
 </form>
 </div>

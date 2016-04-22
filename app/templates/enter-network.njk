@@ -1,7 +1,7 @@
-{% extends "base.html" %} {% block title %}Add new network{% endblock %} {% block body %}
+{% extends "base.njk" %} {% block title %}Enter network{% endblock %} {% block body %}
 
 <div class="ui form segment">
-<form action="/add-network" method="post">
+<form action="/join-network" method="post">
   <p>Please enter the network's name</p>
     <div class="field">
       <label>Network</label>
@@ -9,7 +9,7 @@
     </div>
   <input type="hidden" name="uid" value="{{ uid }}">
   <div class="inline field">
-  <button type="submit"> Add Network </button>
+  <button type="submit"> Join Network </button>
 </div>
 </form>
 </div>
