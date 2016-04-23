@@ -32,4 +32,10 @@ app.get("/login", function(req, res) {
 	} ));
 });
 
+
+/// \todo
+app.get("/get-current-song", function(req, res) {
+
+});
+
 app.listen(8080);

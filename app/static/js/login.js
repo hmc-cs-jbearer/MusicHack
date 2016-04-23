@@ -1,8 +1,5 @@
 /**
- * Verify that the user is logged in.
- * If they are not, redirect to the login page.
- * If they are, send data to a callback function. The data is a JSON object with
- * the following fields:
+ * A JSON object describing the current user. Contains the following fields:
  * * uid: a unique user ID
  * * token: a Firebase token for the user
  * * expires: the time at which the user's session expires, in seconds since the
@@ -12,12 +9,30 @@
  * The object may contain additional fields specific to the provider. See
  * Firebase documentation.
  */
- function checkLogin(callback) {
+var user;
+
+var firebase = new Firebase("https://musichack16.firebaseio.com/");
+
+firebase.onAuth(function(authData) {
+    if (authData) {
+        user = authData;
+    }
+    else {
+        login();
+    }
+});
+
+/**
+ * Verify that the user is logged in.
+ * If they are not, redirect to the login page.
+ * If they are, initialize user.
+ */
+ function login(callback) {
     var database = new Firebase("https://musichack16.firebaseio.com/");
 
     var auth = database.getAuth();
     if (auth) {
-        callback(auth);
+        user = auth;
     }
     else {
         window.location = "/login?continue=" + window.location;

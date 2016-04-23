@@ -18,7 +18,7 @@
         <!-- Load jQuery from static folder if we couldn't get it from Google -->
         <script>window.jQuery || document.write('<script src="js/jquery.js">\x3C/script>')</script>
 
-        <script src="/js/login.js"></script>
+        {% block scripts %}{% endblock %}
 
         <div id="main-container" class="ui center aligned container">
             {% block body %}{% endblock %}
