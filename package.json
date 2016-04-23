@@ -11,5 +11,9 @@
 	"repository" : {
 	   "type" : "git",
 	   "url" : "https://github.com/hmc-cs-jbearer/MusicHack.git"
+	 },
+
+	 "jshintConfig" : {
+	 	"esversion" : 6
 	 }
 }

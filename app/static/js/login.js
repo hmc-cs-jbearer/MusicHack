@@ -9,18 +9,9 @@
  * The object may contain additional fields specific to the provider. See
  * Firebase documentation.
  */
-var user;
+ var user;
 
-var firebase = new Firebase("https://musichack16.firebaseio.com/");
-
-firebase.onAuth(function(authData) {
-    if (authData) {
-        user = authData;
-    }
-    else {
-        login();
-    }
-});
+ var firebase = new Firebase("https://musichack16.firebaseio.com/");
 
 /**
  * Verify that the user is logged in.
@@ -37,4 +28,13 @@ firebase.onAuth(function(authData) {
     else {
         window.location = "/login?continue=" + window.location;
     }
- }
+}
+
+firebase.onAuth(function(authData) {
+    if (authData) {
+        user = authData;
+    }
+    else {
+        login();
+    }
+});

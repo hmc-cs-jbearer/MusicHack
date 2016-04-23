@@ -1,80 +1,16 @@
-{% extends "private-view.njk" %} {% block title %}Welcome{% endblock %}
+{% extends "private-view.njk" %} {% block title %}Juke{% endblock %}
+
+{% block scripts %}
+
+{{ super() }}
+
+<script src="/js/user-interface.js"></script>
+
+syncToNetwork("{{ nid }}");
+
+{% endblock %}
 
 {% block body %}
-
-<script type="text/javascript">
-  var audioNeedsSrc = true;
-
-  setInterval(
-    function()
-    {
-     $.getJSON(
-      "/get-current-song",
-      {
-        nid : "{{ nid }}",
-        token : user.token
-      },
-      function(data)
-      {
-        if (data.invalid) {
-          return;
-        }
-
-        $("#current_song_title").text(data.name);
-        $("#current_artist_name").text(data.artist_name);
-        $("#current_album_name").text(data.album_name);
-        document.getElementById("current_album_art").src = data.image_url;
-        {% if cur_network.is_admin %}
-        if (audioNeedsSrc) {
-          document.getElementById("player").src = data.audio_url;
-          audioNeedsSrc = false;
-        }
-
-        {% endif %}
-      });
-   },
-   1000);
-
-  function nextSong() {
-    $.getJSON(
-      $SCRIPT_ROOT + '/get-next-song',
-      {
-        nid : "{{ nid }}",
-        uid : "{{ uid }}"
-      },
-      function(data)
-      {
-        if (data.redirect) {
-          window.location="/prompt-google?target="+data.target+"&nid="+data.nid+"&uid="+data.uid;
-          return;
-        }
-        else if (data.invalid) {
-          return;
-        }
-
-        $("#current_song_title").text(data.name);
-        $("#current_artist_name").text(data.artist_name);
-        $("#current_album_name").text(data.album_name);
-        document.getElementById("current_album_art").src = data.image_url;
-        {% if cur_network.is_admin %}
-        document.getElementById("player").src = data.audio_url;
-        {% endif %}
-      });
-  }
-
-  function upvote() {
-    $.getJSON($SCRIPT_ROOT + '/upvote',
-    {
-      nid : "{{ nid }}",
-      token : user.token
-    },
-    function(data) {
-      if (data.invalid) return;
-      document.getElementById("coins").innerHTML=data.newCount + "<i class=\"database icon\"></i>";
-    });
-
-  }
-</script>
 
 <div style = "text-align:right ">
 
@@ -99,9 +35,8 @@
     </a>
   </form>
 
-  {% if cur_network.is_admin %}
+  {% if networks.nid.is_admin %}
   <a href="/add-user"><button type="button">Add a user</button></a>
-
   {% endif %}
 </div>
 
@@ -121,74 +56,19 @@
       Networks
     </a>
 
-    {% for network in user_networks %}
+    {% for id, network in networks %}
 
-    <form action="/choose-network">
-      <input type="hidden" name="nid" value="{{ network.id }}">
       <a class="item">
-        <button class = "fluid ui button" type="submit"> {{network.name}}</button>
+        <button class = "fluid ui button" action="/choose-network?nid={{ id }}"> {{network.name}}</button>
       </a>
-    </form>
 
     {% endfor %}
 
   </div>
 
   <div class = "ui centered label">
-    Music for {{ cur_network.name }}
+    Music for {{ networks.nid.name }}
   </div>
-
-  <script type="text/javascript">
-//create the canvas element
-var myCanvas = document.createElement("canvas");
-
-//set the canvas width and height
-myCanvas.width=100;
-myCanvas.height=100;
-
-//get the 2-dimensional drawing context
-var ctx = myCanvas.getContext("2d");
-//first we clear the canvas
-ctx.clearRect(0,0,100,100);
-//setup the palette array
-var grayPalette = ["#aaaaaa","#bbbbbb","#cccccc","#dddddd","#eeeeee"];
-
-//create 10x10 squares
-for (i=0;i<10;i++){
- for(j=0;j<10;j++){
-  //indicate when starting drawing a rectangle
-  ctx.beginPath();
-  ctx.rect(0+10*j,0+10*i,10,10);
-
-  //choose a random color from the palette
-  var randomColorIndex = 
-  Math.round(Math.random() * (grayPalette.length-1));
-  ctx.fillStyle = grayPalette[randomColorIndex];
-
-  //fill the rectangle with the selected color
-  ctx.fill();
-
-  //draw a white border for the rectangle
-  ctx.strokeStyle = "#ffffff";
-  ctx.stroke();
-
-  //indicating when finished drawing the rectangle
-  ctx.closePath();
-}
-}
-
-//this will run when the document has finished loading
-function setDynamicBackground(){
-  //generate the image from the canvas
-  var imageDataURL = myCanvas.toDataURL();
-
-  //set the dynamic image as the background
-  document.body.style.background = 
-  "transparent url('"+imageDataURL+"') repeat";
-}
-</script>
-</head>
-<body onload="setDynamicBackground()">
 
   <div class="pusher">
     <div class="ui basic segment">
@@ -214,18 +94,14 @@ function setDynamicBackground(){
     </div>
   </div>
 
-  {% if cur_network.is_admin %}
+  {% if networks.nid.is_admin %}
   <div class = "play music centered">
-    <audio id="player" controls="controls" autoplay="true" onended="nextSong()">
+    <audio id="player" controls="controls" autoplay="true" onended="nextSong({{ nid }})">
       Your browser does not support the audio element.
     </audio>
   </div>
-
   {% endif %}
 
-  <label class="ui label" id="coins">
-    {{cur_network.coins}}
-    <i class="database icon"></i>
-  </label>
+  <label class="ui label" id="coins"></label>
 
   {% endblock %}
