@@ -10,34 +10,20 @@
  * Firebase documentation.
  */
 
- var user;
+ var user = null;
 
- var firebase = new Firebase("https://musichack16.firebaseio.com/");
-
-/**
- * Verify that the user is logged in.
- * If they are not, redirect to the login page.
- * If they are, initialize user.
- */
-
- function login(callback) {
-    var database = new Firebase("https://musichack16.firebaseio.com/");
-
-    var auth = database.getAuth();
-    if (auth) {
-        user = auth;
-        
-    }
-    else {
-        window.location = "/login?continue=" + window.location;
-    }
-}
+var firebase = new Firebase("https://musichack16.firebaseio.com/");
 
 firebase.onAuth(function(authData) {
     if (authData) {
         user = authData;
+
+        // Enable forms to use hidden inputs to pass token around
+        for (var element in document.getElementsByName("token")) {
+            element.value = user.token;
+        }
     }
     else {
-        login();
+         window.location = "/login?continue=" + window.location;
     }
 });
