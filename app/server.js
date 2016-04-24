@@ -48,17 +48,21 @@ function getData(path, callback) {
 }
 
 /**
- * \brief Display the users homepage.
+ * \brief This endpoint uses post internally, so a GET request to '/' means that
+ *	the user has just navigated to the page and needs to be logged in.
  */
 app.get("/", function(req, res) {
-
-	if (!req.query.hasOwnProperty("token")) {
 		res.redirect("/login?continue=/");
-		return;
-	}
+});
 
+/**
+ * \brief Display the users homepage.
+ */
+app.post("/", function(req, res) {
 	var firebase = new Firebase(DATABASE_URL);
-	firebase.authWithCustomToken(req.query.token, function(error, authData) {
+
+	// Get user data so we can personalize their home page
+	firebase.authWithCustomToken(req.body.token, function(error, authData) {
 		if (error) {
 			res.redirect("/login?continue=/&error=Login+error:+" + error);
 		}
