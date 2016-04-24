@@ -9,7 +9,7 @@
  * The object may contain additional fields specific to the provider. See
  * Firebase documentation.
  */
- var user;
+ var user = null;
 
 var firebase = new Firebase("https://musichack16.firebaseio.com/");
 

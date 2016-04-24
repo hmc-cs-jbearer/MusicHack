@@ -49,10 +49,11 @@ function getData(path, callback) {
 
 /**
  * \brief This endpoint uses post internally, so a GET request to '/' means that
- *	the user has just navigated to the page and needs to be logged in.
+ *	the user has just navigated to the page. Check to see if they have a saved
+ *	session. If so, direct them to their homepage. Otherwise, log them in.
  */
 app.get("/", function(req, res) {
-		res.redirect("/login?continue=/");
+		res.send(templates.render("saved-session.njk"));
 });
 
 /**
