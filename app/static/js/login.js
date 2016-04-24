@@ -19,8 +19,9 @@ firebase.onAuth(function(authData) {
         user = authData;
 
         // Enable forms to use hidden inputs to pass token around
-        for (var element in document.getElementsByName("token")) {
-            element.value = user.token;
+        tokenInputs = document.getElementsByName("token");
+        for (var i = 0; i < tokenInputs.length; i++) {
+            tokenInputs[i].value = user.token;
         }
     }
     else {
