@@ -6,6 +6,13 @@
         <!-- Semantic UI CSS -->
         <link rel="stylesheet" type="text/css" href="//oss.maxcdn.com/semantic-ui/2.1.4/semantic.min.css">
 
+    </head>
+    <body onload>
+
+        <div id="main-container" class="ui center aligned container">
+            {% block body %}{% endblock %}
+        </div>
+
         {% block scripts %}
 
          <!-- Firebase -->
@@ -20,13 +27,6 @@
         <script src="/js/background.js"></script>
 
         {% endblock %}
-
-    </head>
-    <body onload="setDynamicBackground()">
-
-        <div id="main-container" class="ui center aligned container">
-            {% block body %}{% endblock %}
-        </div>
 
     </body>
 </html>

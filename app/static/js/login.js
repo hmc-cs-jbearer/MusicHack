@@ -10,16 +10,17 @@
  * Firebase documentation.
  */
 
- var user = null;
+var user = null;
 
 var firebase = new Firebase("https://musichack16.firebaseio.com/");
 
 firebase.onAuth(function(authData) {
     if (authData) {
+
         user = authData;
 
         // Enable forms to use hidden inputs to pass token around
-        tokenInputs = document.getElementsByName("token");
+        var tokenInputs = document.getElementsByName("token");
         for (var i = 0; i < tokenInputs.length; i++) {
             tokenInputs[i].value = user.token;
         }
