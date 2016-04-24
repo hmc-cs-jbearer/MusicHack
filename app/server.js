@@ -68,9 +68,6 @@ app.get("/", function(req, res) {
 				// Set the current context to the first network in the user's networks
 				nid = Object.keys(networks)[0];
 
-				console.log(nid);
-				console.log(networks);
-
 				res.send(templates.render("user.njk", {
 					// An object containing information about the user's networks
 					networks: networks,
