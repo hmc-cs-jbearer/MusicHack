@@ -14,8 +14,9 @@ syncToNetwork("{{ nid }}");
 
 <div style = "text-align:right ">
 
-  <form action="/new-network" method="post">
+  <form action="/new-network">
     <a class="item">
+      <input type="hidden" name="token"/>
       <button type="submit"> Create new network </button>
     </a>
   </form>

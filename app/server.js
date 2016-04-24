@@ -98,6 +98,35 @@ app.get("/login", function(req, res) {
 });
 
 
+app.get("/new-network", function(req,res) {
+	res.send(templates.render("new-network.njk"));
+});
+
+app.post("/add-network", function(req, res) {
+	token = req.body.token;
+	network_name = req.body.name;
+
+	var firebase = new Firebase(DATABASE_URL);
+	firebase.authWithCustomToken(token, function(error, authData) {
+		if (error) {
+			console.log("Authentication failed!", error);
+		} else {
+			console.log("Authenticated successfully with payload:", authData);
+		}
+
+		console.log(authData);
+
+		//firebase.put("/networks", network_name, {
+		//	"admin": authData.uid
+		//});
+
+	}); //end authWithCustomToken
+
+	res.send(templates.render("user.njk"));
+}); //end add-network
+
+
+
 /// \todo
 app.get("/get-current-song", function(req, res) {
 

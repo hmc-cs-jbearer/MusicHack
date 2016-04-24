@@ -9,6 +9,7 @@
  * The object may contain additional fields specific to the provider. See
  * Firebase documentation.
  */
+
  var user;
 
  var firebase = new Firebase("https://musichack16.firebaseio.com/");
@@ -18,12 +19,14 @@
  * If they are not, redirect to the login page.
  * If they are, initialize user.
  */
+
  function login(callback) {
     var database = new Firebase("https://musichack16.firebaseio.com/");
 
     var auth = database.getAuth();
     if (auth) {
         user = auth;
+        
     }
     else {
         window.location = "/login?continue=" + window.location;
