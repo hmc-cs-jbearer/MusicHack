@@ -27,7 +27,7 @@ syncToNetwork("{{ nid }}");
     </a>
   </form>
 
-  <a href="/"><button type="button">Logout</button></a>
+  <button type="button" onclick="logout()">Logout</button>
 
   <form action="/switch-google" method="post">
     <input type="hidden" name="nid" value="{{ nid }}">
