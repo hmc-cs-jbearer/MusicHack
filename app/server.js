@@ -68,9 +68,6 @@ app.post("/", function(req, res) {
     } else {
       getData("users/" + authData.uid + "/networks", function(networks) {
 
-      	console.log("hello again");
-      	console.log(Object.keys(networks));
-
         // Set the current context to the first network in the user's networks
         nid = Object.keys(networks)[0];
 
