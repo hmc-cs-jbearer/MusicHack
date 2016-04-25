@@ -133,11 +133,10 @@ app.post("/add-network", function(req, res) {
 		});
 */
 	}); //end authWithCustomToken
-    //firebase.put("/networks", network_name, {
-    //  "admin": authData.uid
-    //});
 
-  });
+
+  res.send(templates.render("user.njk"));
+}); //end add-network\
 
 app.get("/enter-network", function(req, res) {
 	res.send(templates.render("join-network.njk"));
@@ -156,7 +155,5 @@ app.get("/create-account", function(req, res) {
 app.get("/get-current-song", function(req, res) {
 
 });
-
-
 
 app.listen(8080);
