@@ -98,18 +98,28 @@ function syncUpdate(nid) {
   console.log("Updating current song");
 
   // Update the song info
-  var queue = getData("networks/" + nid + "/queue");
-  var song_id = queue.front;
-  var songData = queue.song_id;
+  getData("networks/" + nid + "/queue", function(queue) {
+    var song_id = queue.front;
+    var songData = queue.song_id;
 
-  // The song ID is not stored with the rest of the data since it is the key
-  songData.song_id = song_id;
+    // The song ID is not stored with the rest of the data since it is the key
+    songData.song_id = song_id;
 
-  updateSongData(songData);
+    updateSongData(songData);
+
+  }, function(error) {
+    console.log(error);
+  });
+  
 
   console.log("Updating coin coint.");
 
   // Update the coin count
-  var coinCount = getData("users/" + user.uid + "/networks/" + nid + "/coins");
-  updateCoinCount(coinCount);
+  getData("users/" + user.uid + "/networks/" + nid + "/coins", function(count) {
+    updateCoinCount(coinCount);
+    
+  }, function(error) {
+    console.log(error);
+  });
+  
 }
