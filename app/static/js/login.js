@@ -21,21 +21,6 @@ firebase.onAuth(function(authData) {
   if (authData) {
     user = authData;
 
-<<<<<<< HEAD
-        user = authData;
-
-        // Enable forms to use hidden inputs to pass token around
-        var tokenInputs = document.getElementsByName("token");
-
-        for (var i = 0; i < tokenInputs.length; i++) {
-            console.log("Token in loop: " + user.token);
-            tokenInputs[i].value = user.token;
-        }
-    }
-    else {
-         window.location = "/login?continue=" + window.location;
-    }
-=======
     // Enable forms to use hidden inputs to pass token around
     var tokenInputs = document.getElementsByName("token");
       for (var i = 0; i < tokenInputs.length; i++) {
@@ -44,5 +29,4 @@ firebase.onAuth(function(authData) {
     } else {
       window.location = "/login?continue=" + window.location;
   }
->>>>>>> 51993c45d0de7903d061aa08a2d24eea652c4e6f
 });

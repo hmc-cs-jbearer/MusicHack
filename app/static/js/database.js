@@ -32,7 +32,9 @@ function getData(path) {
     finished = true;
   });
 
+  console.log("Waiting for GET response.");
   while(!finished) {}
+  console.log("Got response.");
 
   return result;
 }
