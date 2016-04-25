@@ -68,6 +68,9 @@ app.post("/", function(req, res) {
     } else {
       getData("users/" + authData.uid + "/networks", function(networks) {
 
+      	console.log("hello again");
+      	console.log(Object.keys(networks));
+
         // Set the current context to the first network in the user's networks
         nid = Object.keys(networks)[0];
 
@@ -104,20 +107,7 @@ app.get("/new-network", function(req,res) {
 
 
 app.post("/add-network", function(req, res) {
-<<<<<<< HEAD
 
-	token = req.body.token;
-	network_name = req.body.name;
-
-	var firebase = new Firebase(DATABASE_URL);
-	firebase.authWithCustomToken(token, function(error, authData) {
-
-		if (error) {
-			console.log("Authentication failed!", error);
-		} else {
-			console.log("Authenticated successfully with payload:", authData);
-		}
-=======
   token = req.body.token;
   network_name = req.body.name;
 
@@ -128,11 +118,9 @@ app.post("/add-network", function(req, res) {
     } else {
       console.log("Authenticated successfully with payload:", authData);
     }
->>>>>>> 51993c45d0de7903d061aa08a2d24eea652c4e6f
 
     console.log(authData);
 
-<<<<<<< HEAD
 		var networksRef = firebase.child("users").child(authData.uid).child("networks");
 
 		/*
@@ -148,16 +136,11 @@ app.post("/add-network", function(req, res) {
 		});
 */
 	}); //end authWithCustomToken
-=======
     //firebase.put("/networks", network_name, {
     //  "admin": authData.uid
     //});
 
-  }); //end authWithCustomToken
->>>>>>> 51993c45d0de7903d061aa08a2d24eea652c4e6f
-
-  res.send(templates.render("user.njk"));
-}); //end add-network
+  });
 
 app.get("/enter-network", function(req, res) {
 	res.send(templates.render("join-network.njk"));
@@ -165,9 +148,12 @@ app.get("/enter-network", function(req, res) {
 
 app.post("/join-network", function(req, res) {
 	
-})
+});
 
-
+// creating a new account
+app.get("/create-account", function(req, res) {
+	res.send(templates.render("register.njk"));
+});
 
 /// \todo
 app.get("/get-current-song", function(req, res) {
@@ -175,6 +161,5 @@ app.get("/get-current-song", function(req, res) {
 });
 
 
-app.get("")
 
 app.listen(8080);
