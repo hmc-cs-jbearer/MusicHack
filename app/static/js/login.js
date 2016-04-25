@@ -11,9 +11,6 @@
  */
 var user = null;
 
-// Global Firebase reference that can be used throughout the project
-var firebase = new Firebase("https://musichack16.firebaseio.com/");
-
 /**
  * Called on page load and ever time the user's authorization status
  *  changes. Check that the user is logged in, and redirect to the

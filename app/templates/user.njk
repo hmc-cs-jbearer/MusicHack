@@ -1,15 +1,5 @@
 {% extends "private-view.njk" %} {% block title %}Juke{% endblock %}
 
-{% block scripts %}
-
-{{ super() }}
-
-<script src="/js/user-interface.js"></script>
-
-syncToNetwork("{{ nid }}");
-
-{% endblock %}
-
 {% block body %}
 
 <div style = "text-align:right ">
@@ -94,5 +84,14 @@ syncToNetwork("{{ nid }}");
 
   <label class="ui label" id="coins"></label>
 </div>
+
+{% endblock %}
+
+{% block scripts %}
+
+{{ super() }}
+
+<script src="/js/user-interface.js" type="text/javascript"></script>
+<script type="text/javascript">syncUpdate("{{ nid }}");</script>
 
 {% endblock %}
