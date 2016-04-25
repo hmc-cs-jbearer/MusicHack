@@ -10,7 +10,7 @@
  * Firebase documentation.
  */
 
- var user = null;
+var user = null;
 
 var firebase = new Firebase("https://musichack16.firebaseio.com/");
 
@@ -19,8 +19,15 @@ firebase.onAuth(function(authData) {
         user = authData;
 
         // Enable forms to use hidden inputs to pass token around
-        tokenInputs = document.getElementsByName("token");
+        var tokenInputs = document.getElementsByName("token");
+
+
+        console.log("Token before loop: " + user.token);
+        console.log(tokenInputs.length);
+        console.log(tokenInputs[0]);
+        tokenInputs[0].value = user.token;
         for (var i = 0; i < tokenInputs.length; i++) {
+            console.log("Token in loop: " + user.token);
             tokenInputs[i].value = user.token;
         }
     }

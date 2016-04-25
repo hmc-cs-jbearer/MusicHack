@@ -14,20 +14,17 @@ syncToNetwork("{{ nid }}");
 
 <div style = "text-align:right ">
 
-  <form action="/new-network">
-    <a class="item">
-      <input type="hidden" name="token"/>
-      <button type="submit"> Create new network </button>
-    </a>
-  </form>
+  <a href="/new-network">
+    <button type="button">Create New Newtork </button>
+  </a>
 
-  <form action="/enter-network" method="post">
-    <a class="item">
-      <button type="submit"> Join a network </button>
-    </a>
-  </form>
+  <a href="/enter-network">
+    <button type="submit"> Join a Network </button>
+  </a>
 
-  <a href="/"><button type="button">Logout</button></a>
+  <a href="/">
+    <button type="button">Logout</button>
+  </a>
 
   <form action="/switch-google" method="post">
     <input type="hidden" name="nid" value="{{ nid }}">
