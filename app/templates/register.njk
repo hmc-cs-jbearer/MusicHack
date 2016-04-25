@@ -1,5 +1,7 @@
 {% extends "private-view.njk" %} {% block title %}Create new account{% endblock %}
 
+{% block body %}
+
 {% if error == "username exists" %}
 <p style="color:red">Username already exists</p>
 {% endif %}
@@ -43,11 +45,12 @@
 {% block scripts %}
 {{ super() }} 
 
-{% block body %}
 
 <script language="javascript">
   function check() { //create new acct in firebase
     var ref = new Firebase("https://musichack16.firebaseio.com");
+
+    console.log("checking info");
 
     var password = document.getElementById("password").value;
     var check_password = document.getElementById("retype-password").value;
@@ -76,6 +79,8 @@
         var users = ref.child("users");
         var thisUser = users.child(userData.uid);
 
+        console.log("hello");
+
         thisUser.set({
           name: document.getElementById("name").value,
           username: document.getElementById("username").value,
@@ -89,7 +94,7 @@
         }); //end set
       } //end else
       
-      window.location = '/user?uid=' + userData.uid;
+       window.location = "/";
     });
   }
 </script>

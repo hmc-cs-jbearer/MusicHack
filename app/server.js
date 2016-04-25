@@ -104,6 +104,7 @@ app.get("/new-network", function(req,res) {
 
 
 app.post("/add-network", function(req, res) {
+
   token = req.body.token;
   network_name = req.body.name;
 
@@ -133,8 +134,9 @@ app.post("/add-network", function(req, res) {
 */
 	}); //end authWithCustomToken
 
+
   res.send(templates.render("user.njk"));
-}); //end add-network
+}); //end add-network\
 
 app.get("/enter-network", function(req, res) {
 	res.send(templates.render("join-network.njk"));
@@ -144,14 +146,14 @@ app.post("/join-network", function(req, res) {
 	
 });
 
-
+// creating a new account
+app.get("/create-account", function(req, res) {
+	res.send(templates.render("register.njk"));
+});
 
 /// \todo
 app.get("/get-current-song", function(req, res) {
 
 });
-
-
-app.get("");
 
 app.listen(8080);
