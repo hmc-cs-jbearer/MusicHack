@@ -12,7 +12,7 @@
  *  graphics to display while the song is playing)
  * * song_id: an ID that can be used to get an audio stream for the song
  */
-function updateSongData(data) {
+function updateSongData(data, isAdmin=false) {
   console.log("Updating song: " + data);
 
   $("#current_song_title").text(data.name);
@@ -20,7 +20,7 @@ function updateSongData(data) {
   $("#current_album_name").text(data.album_name);
   $("#current_album_art").src = data.image_url;
 
-  if (firebase.child("networks/" + nid + "/admins").hasChild(user.uid)) {
+  if (isAdmin) {
       // If the user is an admin, get the stream audio
       /// \todo This is a spotify thing that I don't know how to do yet
   }
@@ -98,18 +98,28 @@ function syncUpdate(nid) {
   console.log("Updating current song");
 
   // Update the song info
-  var queue = getData("networks/" + nid + "/queue");
-  var song_id = queue.front;
-  var songData = queue.song_id;
+  getData("networks/" + nid + "/queue", function(queue) {
+    var song_id = queue.front;
+    var songData = queue.song_id;
 
-  // The song ID is not stored with the rest of the data since it is the key
-  songData.song_id = song_id;
+    // The song ID is not stored with the rest of the data since it is the key
+    songData.song_id = song_id;
 
-  updateSongData(songData);
+    updateSongData(songData);
+
+  }, function(error) {
+    console.log(error);
+  });
+  
 
   console.log("Updating coin coint.");
 
   // Update the coin count
-  var coinCount = getData("users/" + user.uid + "/networks/" + nid + "/coins");
-  updateCoinCount(coinCount);
+  getData("users/" + user.uid + "/networks/" + nid + "/coins", function(count) {
+    updateCoinCount(coinCount);
+
+  }, function(error) {
+    console.log(error);
+  });
+  
 }

@@ -68,6 +68,14 @@ app.post("/", function(req, res) {
     } else {
       getData("users/" + authData.uid + "/networks", function(networks) {
 
+        if (!networks) {
+          // The user is not yet subscribed to any networks
+          res.send(templates.render("user.njk", {
+            networks: {}
+          }));
+          return;
+        }
+
         // Set the current context to the first network in the user's networks
         nid = Object.keys(networks)[0];
 
@@ -146,14 +154,29 @@ app.get("/enter-network", function(req, res) {
 });
 
 app.post("/join-network", function(req, res) {
-	
+	/// \todo Implement join-network
 });
 
 
 
-/// \todo
+app.get("/forgot-password", function(req, res) {
+  /// \todo Implement forgot-password
+});
+
 app.get("/get-current-song", function(req, res) {
-
+  /// \todo Implement get-current-song
 });
+
+app.post("/search", function(req, res) {
+  /// \todo Implement search
+});
+
+app.post("/add-to-queue", function(req, res) {
+  /// \todo Implement add-to-queue
+});
+
+app.get("/choose-network", function(req, res) {
+  /// \todo Implement choose-network
+}); 
 
 app.listen(8080);
