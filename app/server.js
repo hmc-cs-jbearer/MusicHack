@@ -107,8 +107,6 @@ app.get("/new-network", function(req,res) {
 
 app.post("/add-network", function(req, res) {
 
-	console.log(req.body);
-
 	token = req.body.token;
 	network_name = req.body.name;
 
@@ -123,10 +121,20 @@ app.post("/add-network", function(req, res) {
 
 		console.log(authData);
 
+		var networksRef = firebase.child("users").child(authData.uid).child("networks");
+
+		/*
+		firebase.child("users").set("hello");
+
+		networksRef.set({"attempt":
+			{coins: 100}
+		});
+		*/
+		/*
 		firebase.put("/networks", network_name, {
 			"admin": authData.uid
 		});
-
+*/
 	}); //end authWithCustomToken
 
 	res.send(templates.render("user.njk"));
