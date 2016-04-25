@@ -45,3 +45,5 @@ function setDynamicBackground(){
   document.body.style.background = 
   "transparent url('"+imageDataURL+"') repeat";
 }
+
+setDynamicBackground();

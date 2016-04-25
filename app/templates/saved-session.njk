@@ -1,6 +1,8 @@
 {% extends "private-view.njk" %}
 
-{% block body %}
+{% block scripts %}
+
+{{ super() }}
 
 <script type="text/javascript">
 
@@ -11,6 +13,10 @@ if (user) {
 // Otherwise, the login script will redirect us to the login page
 
 </script>
+
+{% endblock %}
+
+{% block body %}
 
 <form action="/" id="recoverSession" method="post">
 
