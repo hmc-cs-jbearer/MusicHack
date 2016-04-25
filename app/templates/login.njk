@@ -1,28 +1,10 @@
-{% extends "base.njk" %} {% block title %}Juke!{% endblock %} {% block body %}
+{% extends "base.njk" %} {% block title %}Juke!{% endblock %}
+
+{% block body %}
 
 {% if error %}
 <p style="color:red">{{ error }}</p>
 {% endif %}
-
-<script language="javascript">
-  function check() { //create new acct in firebase
- 
-    var ref = new Firebase("https://musichack16.firebaseio.com");
-    ref.authWithPassword({
-      email    : document.getElementById("username").value,
-      password : document.getElementById("password").value
-    }, function(error, userData) {
-      if (error) {
-        window.location = '/login?continue={{ continue }}&error=Invalid+username+or+password.';
-        console.log("Error creating user:", error);
-      } else {
-          console.log("Successfully authenticated user account with token:", userData.token);
-          document.getElementById("tokenOnSuccess").value = userData.token;
-          document.getElementById("loginForm").submit();
-      }
-    });
-  }
-</script>
 
 <div class="ui form segment">
   <p>Welcome to Juke!</p>
@@ -44,5 +26,29 @@
   <button type="button" action="/create-account">Create new account</button>
   <a href="/forgot-password"> Forgot Password? </a>
 </div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+
+<script language="javascript">
+  function check() { //create new acct in firebase
+    var ref = new Firebase("https://musichack16.firebaseio.com");
+    ref.authWithPassword({
+      email    : document.getElementById("username").value,
+      password : document.getElementById("password").value
+    }, function(error, userData) {
+      if (error) {
+        window.location = '/login?continue={{ continue }}&error=Invalid+username+or+password.';
+        console.log("Error creating user:", error);
+      } else {
+        console.log("Successfully authenticated user account with token:", userData.token);
+        document.getElementById("tokenOnSuccess").value = userData.token;
+        document.getElementById("loginForm").submit();
+      }
+    });
+  }
+</script>
 
 {% endblock %}

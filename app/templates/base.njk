@@ -1,32 +1,31 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8" />
-        <title>{% block title %}{% endblock %}</title>
-        <!-- Semantic UI CSS -->
-        <link rel="stylesheet" type="text/css" href="//oss.maxcdn.com/semantic-ui/2.1.4/semantic.min.css">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{% block title %}{% endblock %}</title>
+        
+    <!-- Semantic UI CSS -->
+    <link rel="stylesheet" type="text/css" href="//oss.maxcdn.com/semantic-ui/2.1.4/semantic.min.css">
+  </head>
 
-    </head>
-    <body onload>
+  <body>
+    <div id="main-container" class="ui center aligned container">
+      {% block body %}{% endblock %}
+    </div>
 
-        <div id="main-container" class="ui center aligned container">
-            {% block body %}{% endblock %}
-        </div>
+    {% block scripts %}
 
-        {% block scripts %}
+     <!-- Firebase -->
+    <script src="https://cdn.firebase.com/js/client/2.4.2/firebase.js"></script>
 
-         <!-- Firebase -->
-        <script src="https://cdn.firebase.com/js/client/2.4.2/firebase.js"></script>
+    <!-- Try to load jQuery from Google's AJAX API -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 
-        <!-- Try to load jQuery from Google's AJAX API -->
-        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <!-- Load jQuery from static folder if we couldn't get it from Google -->
+    <script>window.jQuery || document.write('<script src="js/jquery.js">\x3C/script>')</script>
 
-        <!-- Load jQuery from static folder if we couldn't get it from Google -->
-        <script>window.jQuery || document.write('<script src="js/jquery.js">\x3C/script>')</script>
+    <script src="/js/background.js"></script>
 
-        <script src="/js/background.js"></script>
-
-        {% endblock %}
-
-    </body>
+    {% endblock %}
+  </body>
 </html>

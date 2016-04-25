@@ -1,57 +1,4 @@
-{% extends "private-view.njk" %} {% block title %}Create new account{% endblock %} {% block body %}
-
-<script language="javascript">
-    function check() { //create new acct in firebase
-        //document.write(document.getElementById("name").value);
-      var ref = new Firebase("https://musichack16.firebaseio.com");
-
-      var password = document.getElementById("password").value
-      var check_password = document.getElementById("retype-password").value
-
-      if (!(password === check_password)) {
-        window.location = "/passwords-dont-match"
-      }
-
-        ref.createUser({
-         email    : document.getElementById("username").value,
-         password : document.getElementById("password").value
-       }, function(error, userData) {
-      if (error) {
-          switch (error.code) {
-            case "EMAIL_TAKEN":
-              window.location = "/username-exists"
-              break;
-            case "INVALID_EMAIL":
-              window.location = "/invalid-email"
-              break;
-            default:
-              document.write(error)
-              console.log("Error creating user:", error);
-          }
-      } else {
-          
-          var users = ref.child("users");
-          var thisUser = users.child(userData.uid);
-
-          //var userid = userData.uid;
-          thisUser.set({
-              name: document.getElementById("name").value,
-              username: document.getElementById("username").value,
-
-              networks: {
-                test_network: {
-                  name: "West",
-                  coins: 5,
-                  is_admin: "true"
-                }
-              }
-            }); //end set
-        } //end else
-        window.location = '/user?uid=' + userData.uid;
-      });
- 
-      }
-</script>
+{% extends "private-view.njk" %} {% block title %}Create new account{% endblock %}
 
 {% if error == "username exists" %}
 <p style="color:red">Username already exists</p>
@@ -67,79 +14,84 @@
 
 <div class="ui form segment">
   <p>Tell us about yourself</p>
-    <div class="field">
-      <label>Name</label>
-      <input placeholder="Name" id="name" type="text">
-    </div>
-    <div class="field">
-      <label>Username</label>
-      <input placeholder="Username" id="username" type="text">
-    </div>
-    <div class="field">
-      <label>Password</label>
-      <input placeholder="Password" type="password" id="password">
-    </div>
-    <div class="field">
-      <label>Re-type password</label>
-      <input placeholder="Reenter your password" type="password" id="retype-password">
-    </div>
+  <div class="field">
+    <label>Name</label>
+    <input placeholder="Name" id="name" type="text">
+  </div>
+  <div class="field">
+    <label>Username</label>
+    <input placeholder="Username" id="username" type="text">
+  </div>
+  <div class="field">
+    <label>Password</label>
+    <input placeholder="Password" type="password" id="password">
+  </div>
+  <div class="field">
+    <label>Re-type password</label>
+    <input placeholder="Reenter your password" type="password" id="retype-password">
+  </div>
   <div class="inline field">
-  <div>
-  <button onclick="check()"> Create account</button>
-  <a href="/"><button type="button">Back</button></a>
-  <div class="ui error message"></div>
+    <div>
+      <button onclick="check()"> Create account</button>
+      <a href="/"><button type="button">Back</button></a>
+    </div>
+  </div>
 </div>
 
-<script type="text/javascript">
-//create the canvas element
-var myCanvas = document.createElement("canvas");
+{% endblock %}
 
-//set the canvas width and height
-myCanvas.width=100;
-myCanvas.height=100;
+{% block scripts %}
+{{ super() }} 
 
-//get the 2-dimensional drawing context
-var ctx = myCanvas.getContext("2d");
-//first we clear the canvas
-ctx.clearRect(0,0,100,100);
-//setup the palette array
-var grayPalette = ["#aaaaaa","#bbbbbb","#cccccc","#dddddd","#eeeeee"];
+{% block body %}
 
-//create 10x10 squares
-for (i=0;i<10;i++){
- for(j=0;j<10;j++){
-  //indicate when starting drawing a rectangle
-  ctx.beginPath();
-  ctx.rect(0+10*j,0+10*i,10,10);
+<script language="javascript">
+  function check() { //create new acct in firebase
+    var ref = new Firebase("https://musichack16.firebaseio.com");
 
-  //choose a random color from the palette
-  var randomColorIndex = 
-    Math.round(Math.random() * (grayPalette.length-1));
-  ctx.fillStyle = grayPalette[randomColorIndex];
+    var password = document.getElementById("password").value;
+    var check_password = document.getElementById("retype-password").value;
 
-  //fill the rectangle with the selected color
-  ctx.fill();
+    if (password !== check_password) {
+      window.location = "/passwords-dont-match";
+    }
 
-  //draw a white border for the rectangle
-  ctx.strokeStyle = "#ffffff";
-  ctx.stroke();
+    ref.createUser({
+      email    : document.getElementById("username").value,
+      password : document.getElementById("password").value
+    }, function(error, userData) {
+      if (error) {
+        switch (error.code) {
+        case "EMAIL_TAKEN":
+          window.location = "/username-exists";
+          break;
+        case "INVALID_EMAIL":
+          window.location = "/invalid-email";
+          break;
+        default:
+          document.write(error);
+          console.log("Error creating user:", error);
+        }
+      } else {   
+        var users = ref.child("users");
+        var thisUser = users.child(userData.uid);
 
-  //indicating when finished drawing the rectangle
-  ctx.closePath();
- }
-}
-
-//this will run when the document has finished loading
-function setDynamicBackground(){
-  //generate the image from the canvas
-  var imageDataURL = myCanvas.toDataURL();
-
-  //set the dynamic image as the background
-  document.body.style.background = 
-   "transparent url('"+imageDataURL+"') repeat";
-}
+        thisUser.set({
+          name: document.getElementById("name").value,
+          username: document.getElementById("username").value,
+          networks: {
+            test_network: {
+              name: "West",
+              coins: 5,
+              is_admin: "true"
+            }
+          }
+        }); //end set
+      } //end else
+      
+      window.location = '/user?uid=' + userData.uid;
+    });
+  }
 </script>
-</head>
-<body onload="setDynamicBackground()">
 
 {% endblock %}

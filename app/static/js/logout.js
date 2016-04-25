@@ -4,5 +4,5 @@
  * the login page.
  */
 function logout() {
-	firebase.unauth();
+  firebase.unauth();
 }

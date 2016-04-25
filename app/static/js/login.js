@@ -21,17 +21,15 @@ var firebase = new Firebase("https://musichack16.firebaseio.com/");
  *  for later use by the page.
  */
 firebase.onAuth(function(authData) {
-    if (authData) {
+  if (authData) {
+    user = authData;
 
-        user = authData;
-
-        // Enable forms to use hidden inputs to pass token around
-        var tokenInputs = document.getElementsByName("token");
-        for (var i = 0; i < tokenInputs.length; i++) {
-            tokenInputs[i].value = user.token;
-        }
-    }
-    else {
-         window.location = "/login?continue=" + window.location;
-    }
+    // Enable forms to use hidden inputs to pass token around
+    var tokenInputs = document.getElementsByName("token");
+      for (var i = 0; i < tokenInputs.length; i++) {
+        tokenInputs[i].value = user.token;
+      }
+    } else {
+      window.location = "/login?continue=" + window.location;
+  }
 });
