@@ -97,6 +97,11 @@ app.get("/login", function(req, res) {
   } ));
 });
 
+// creating a new account
+app.get("/create-account", function(req, res) {
+  res.send(templates.render("register.njk"));
+});
+
 
 app.get("/new-network", function(req,res) {
   res.send(templates.render("new-network.njk"));
@@ -116,22 +121,20 @@ app.post("/add-network", function(req, res) {
       console.log("Authenticated successfully with payload:", authData);
     }
 
-    console.log(authData);
+    // add the network to the user's list of networks making them admin
+		var userNetworksRef =
+      firebase.child("users").child(authData.uid).child("networks").child(network_name);
 
-		var networksRef = firebase.child("users").child(authData.uid).child("networks");
-
-		/*
-		firebase.child("users").set("hello");
-
-		networksRef.set({"attempt":
-			{coins: 100}
+		userNetworksRef.set({
+      coins: 5,
+      is_admin: "true"
 		});
-		*/
-		/*
-		firebase.put("/networks", network_name, {
-			"admin": authData.uid
+		
+		var networksRef = firebase.child("networks").child(network_name);
+		networksRef.set({
+			"admins": authData.uid
 		});
-*/
+
 	}); //end authWithCustomToken
 
 
@@ -146,10 +149,7 @@ app.post("/join-network", function(req, res) {
 	
 });
 
-// creating a new account
-app.get("/create-account", function(req, res) {
-	res.send(templates.render("register.njk"));
-});
+
 
 /// \todo
 app.get("/get-current-song", function(req, res) {
