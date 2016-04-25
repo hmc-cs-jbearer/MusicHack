@@ -1,3 +1,7 @@
+/**
+ * Javascript interface for controls on the user.html page
+ */
+
 // Update the page whenever data changes in the network with ID nid
 function syncToNetwork(nid) {
 
@@ -20,12 +24,21 @@ function syncToNetwork(nid) {
   firebase.child("users/" + user.uid + "/networks/" + nid + "/coins").on("value", function(snapshot) {
     $("#coins").innerHTML = snapshot.val() + "<i class=\"database icon\">\x3C/i>";
   });
-
 }
 
 // Upvote the current song on the network with ID nid
 function upvote(nid) {
   $.ajax("/upvote", {
+    data : {
+      nid: nid,
+      token: user.token
+    }
+  });
+}
+
+// Downvote the current song on the network with ID nid
+function downvote(nid) {
+  $.ajax("/downvote", {
     data : {
       nid: nid,
       token: user.token
@@ -40,5 +53,5 @@ function nextSong(nid) {
       nid: nid,
       token: user.token
     }
-  })
+  });
 }

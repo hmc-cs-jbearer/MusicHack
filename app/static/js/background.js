@@ -14,26 +14,26 @@ var grayPalette = ["#aaaaaa","#bbbbbb","#cccccc","#dddddd","#eeeeee"];
 
 //create 10x10 squares
 for (i=0;i<10;i++){
- for(j=0;j<10;j++){
-  //indicate when starting drawing a rectangle
-  ctx.beginPath();
-  ctx.rect(0+10*j,0+10*i,10,10);
+  for(j=0;j<10;j++){
+    //indicate when starting drawing a rectangle
+    ctx.beginPath();
+    ctx.rect(0+10*j,0+10*i,10,10);
 
-  //choose a random color from the palette
-  var randomColorIndex = 
-  Math.round(Math.random() * (grayPalette.length-1));
-  ctx.fillStyle = grayPalette[randomColorIndex];
+    //choose a random color from the palette
+    var randomColorIndex = 
+    Math.round(Math.random() * (grayPalette.length-1));
+    ctx.fillStyle = grayPalette[randomColorIndex];
 
-  //fill the rectangle with the selected color
-  ctx.fill();
+    //fill the rectangle with the selected color
+    ctx.fill();
 
-  //draw a white border for the rectangle
-  ctx.strokeStyle = "#ffffff";
-  ctx.stroke();
+    //draw a white border for the rectangle
+    ctx.strokeStyle = "#ffffff";
+    ctx.stroke();
 
-  //indicating when finished drawing the rectangle
-  ctx.closePath();
-}
+    //indicating when finished drawing the rectangle
+    ctx.closePath();
+  }
 }
 
 //this will run when the document has finished loading

@@ -22,12 +22,10 @@ syncToNetwork("{{ nid }}");
     <button type="submit"> Join a Network </button>
   </a>
 
-  <a href="/">
-    <button type="button">Logout</button>
-  </a>
+  <button type="button" onclick="logout()">Logout</button>
 
   <form action="/switch-google" method="post">
-    <input type="hidden" name="nid" value="{{ nid }}">
+    <input type="hidden" name="nid" value="{{ nid }}"/>
     <a class="item">
       <button type="submit"> Switch Google accounts </button>
     </a>
@@ -39,11 +37,10 @@ syncToNetwork("{{ nid }}");
 </div>
 
 <form action="/search" method="post">
-
-  <input name="nid" type="hidden" value="{{ nid }}">
+  <input name="nid" type="hidden" value="{{ nid }}"/>
   <div class="ui huge icon input">
     <i class="search icon"></i>
-    <input name="query" type="text" placeholder="Search for a song... ">
+    <input name="query" type="text" placeholder="Search for a song... "/>
   </div>
 </form>
 
@@ -55,19 +52,14 @@ syncToNetwork("{{ nid }}");
     </a>
 
     {% for id, network in networks %}
-
-      <a class="item">
-        <button class = "fluid ui button" action="/choose-network?nid={{ id }}"> {{network.name}}</button>
-      </a>
-
+    <a class="item">
+      <button class = "fluid ui button" action="/choose-network?nid={{ id }}"> {{network.name}}</button>
+    </a>
     {% endfor %}
-
   </div>
-
   <div class = "ui centered label">
     Music for {{ networks.nid.name }}
   </div>
-
   <div class="pusher">
     <div class="ui basic segment">
       <div class="ui card centered">
@@ -80,13 +72,13 @@ syncToNetwork("{{ nid }}");
             <span id="current_artist_name"></span> 
             <br>
             <span id="current_album_name"></span>
-            <i class="left floated thumbs down icon"></i>
             <button onclick="upvote()" class="ui icon button">
               <i class="right floated thumbs up icon"></i>
             </button>
-
+            <button onclick="downvote()" class="ui icon button">
+              <i class="left floated thumbs down icon"></i>
+            </button>
           </div>
-
         </div>
       </div>
     </div>
@@ -101,5 +93,6 @@ syncToNetwork("{{ nid }}");
   {% endif %}
 
   <label class="ui label" id="coins"></label>
+</div>
 
-  {% endblock %}
+{% endblock %}
