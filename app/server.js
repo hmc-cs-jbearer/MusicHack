@@ -102,7 +102,22 @@ app.get("/new-network", function(req,res) {
   res.send(templates.render("new-network.njk"));
 });
 
+
 app.post("/add-network", function(req, res) {
+<<<<<<< HEAD
+
+	token = req.body.token;
+	network_name = req.body.name;
+
+	var firebase = new Firebase(DATABASE_URL);
+	firebase.authWithCustomToken(token, function(error, authData) {
+
+		if (error) {
+			console.log("Authentication failed!", error);
+		} else {
+			console.log("Authenticated successfully with payload:", authData);
+		}
+=======
   token = req.body.token;
   network_name = req.body.name;
 
@@ -113,17 +128,44 @@ app.post("/add-network", function(req, res) {
     } else {
       console.log("Authenticated successfully with payload:", authData);
     }
+>>>>>>> 51993c45d0de7903d061aa08a2d24eea652c4e6f
 
     console.log(authData);
 
+<<<<<<< HEAD
+		var networksRef = firebase.child("users").child(authData.uid).child("networks");
+
+		/*
+		firebase.child("users").set("hello");
+
+		networksRef.set({"attempt":
+			{coins: 100}
+		});
+		*/
+		/*
+		firebase.put("/networks", network_name, {
+			"admin": authData.uid
+		});
+*/
+	}); //end authWithCustomToken
+=======
     //firebase.put("/networks", network_name, {
     //  "admin": authData.uid
     //});
 
   }); //end authWithCustomToken
+>>>>>>> 51993c45d0de7903d061aa08a2d24eea652c4e6f
 
   res.send(templates.render("user.njk"));
 }); //end add-network
+
+app.get("/enter-network", function(req, res) {
+	res.send(templates.render("join-network.njk"));
+});
+
+app.post("/join-network", function(req, res) {
+	
+})
 
 
 
@@ -131,5 +173,8 @@ app.post("/add-network", function(req, res) {
 app.get("/get-current-song", function(req, res) {
 
 });
+
+
+app.get("")
 
 app.listen(8080);
