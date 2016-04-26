@@ -144,10 +144,15 @@ app.post("/add-network", function(req, res) {
       is_admin: "true"
 		});
 		
+    // add the user to the network's admins and users
 		var networksRef = firebase.child("networks").child(network_name);
 		networksRef.set({
-			"admins": authData.uid
+			"admins": authData.uid,
 		});
+
+    networksRef.child("users").child(authData.uid).set("value");
+
+
 
 	}); //end authWithCustomToken
 
@@ -196,7 +201,7 @@ app.post("/join-network", function(req, res) {
       else {
 
         // add this user to the network's list of users
-        networksRef.child(network_name).child("users").set(authData.uid);
+        networksRef.child(network_name).child("users").child(authData.uid).set("value");
 
         // add this network to the user's list of networks
         var userNetworksRef =
