@@ -115,7 +115,13 @@ app.get("/new-network", function(req,res) {
   res.send(templates.render("new-network.njk"));
 });
 
-
+/*
+* \brief    Creates a new network
+* \details  Creates a new network, with the user as admin.
+*           and updates the user's list of networks.
+*           If the network already exists, then this action does nothing
+* \TODO     Add meaningful error message if network exists
+*/
 app.post("/add-network", function(req, res) {
 
   token = req.body.token;
@@ -149,12 +155,64 @@ app.post("/add-network", function(req, res) {
   res.send(templates.render("user.njk"));
 }); //end add-network\
 
+/// Send user to "join network" page
 app.get("/enter-network", function(req, res) {
 	res.send(templates.render("join-network.njk"));
 });
 
+
+/*
+* \brief    Adds a user to a network
+* \details  Checks if the network exists.  If it does, adds the user to the network
+*           and updates the user's list of networks.
+* \TODO     If the network doesn't exist, give a useful error message
+* \TODO     Instead of manually checking it would be better to update security rules
+*           to prevent users from creating a new network, unless they are admins.
+* \TODO     Make sure you can't add yourself to a network your already admin/user
+*/
 app.post("/join-network", function(req, res) {
-	/// \todo Implement join-network
+	var network_name = req.body.name;
+  var token = req.body.token;
+
+  console.log(token);
+
+  var firebase = new Firebase(DATABASE_URL);
+  firebase.authWithCustomToken(token, function(error, authData) {
+    if (error) {
+      console.log("Authentication failed!", error);
+    } else {
+      console.log("Authenticated successfully with payload:", authData);
+    }
+
+    var networksRef = firebase.child("networks");
+
+    // check if the network already exists
+    networksRef.once("value", function(snapshot) {
+
+      if (!snapshot.child(network_name).exists()) {
+        console.log("ERROR: network " + network_name + " does not exist");
+        res.send(templates.render("user.njk"));
+      }
+      else {
+
+        // add this user to the network's list of users
+        networksRef.child(network_name).child("users").set(authData.uid);
+
+        // add this network to the user's list of networks
+        var userNetworksRef =
+          firebase.child("users").child(authData.uid).child("networks").child(network_name);
+
+        userNetworksRef.set({
+          coins: 5,
+          is_admin: "false"
+        });
+
+        res.send(templates.render("user.njk"));
+      } //end else
+    }); //end once
+  }); //end authWithCustomToken
+
+  /// \todo Implement join-network
 });
 
 
