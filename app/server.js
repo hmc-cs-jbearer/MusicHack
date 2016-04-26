@@ -19,30 +19,44 @@ function getFirebaseSecret(callback) {
   fs.readFile('env.txt', 'utf8', callback);
 }
 
-// Get data from firebase. Callback is called on completion, and takes 1
-// argument, namely the JSON object received.
+/**
+ * Get data from firebase. Callback is called on completion, and takes 1
+ *argument, namely the JSON object received.
+ * 
+ * \param path The path where the data is stored, relative to DATABASE_URL.
+ * \param callback Function of one argument (the JSON received) called after
+ *  the request completes successfully.
+ * \auth auth [optional] The authoriation to use for the request (such as a user
+ *  token). Defaults to the Firebase secret, which grants root access.
+ */ 
 function getData(path, callback) {
-  getFirebaseSecret(function(error, secret) {
-    if (error) {
-      console.log(error);
-    } else {
-      https.get(DATABASE_URL + path + ".json?auth=" + secret, (response) => {
+  if (!auth) {
+    getFirebaseSecret(function(error, secret) {
+      if (error) {
+        console.log(error);
+      } else {
+        // Use Firebase secret as auth
+        getData(path, secret, callback);
+        return;
+      }
+    });
+  }
 
-        // Read incoming data from the request
-        var data = "";
-        response.on("data", (chunk) => {
-          data += chunk;
-        });
+  // We have an auth, go ahead and make the request
+  https.get(DATABASE_URL + path + ".json?auth=" + auth, (response) => {
+    // Read incoming data from the request
+    var data = "";
+    response.on("data", (chunk) => {
+      data += chunk;
+    });
 
-        // Send the data to the callback function
-        response.on("end", () => {
-          return callback(JSON.parse(data));
-        });
+    // Send the data to the callback function
+    response.on("end", () => {
+      return callback(JSON.parse(data));
+    });
 
-      }).on("error", (err) => {
-        console.log(err);
-      });
-    }
+  }).on("error", (err) => {
+    console.log(err);
   });
 }
 
@@ -57,6 +71,9 @@ app.get("/", function(req, res) {
 
 /**
  * \brief Display the users homepage.
+ * \param [body] token The user's login token.
+ * \param [body, optional] nid The ID of the network to display data for.
+ * Defaults to the first network in the user's networks.
  */
 app.post("/", function(req, res) {
   var firebase = new Firebase(DATABASE_URL);
@@ -76,18 +93,21 @@ app.post("/", function(req, res) {
           return;
         }
 
-        // Set the current context to the first network in the user's networks
-        nid = Object.keys(networks)[0];
+        // Set the current context to the chosen network, or to the first
+        // network in the user's networks if no network is specified.
+        var nid = req.body.nid || Object.keys(networks)[0];
 
         res.send(templates.render("user.njk", {
           // An object containing information about the user's networks
           networks: networks,
 
+          current: networks[nid],
+
           // The ID of the current network context to display on the user's page
           nid: nid
 
         }));
-      });
+      }, auth=req.body.token);
     }
   });
 });
@@ -221,8 +241,48 @@ app.get("/forgot-password", function(req, res) {
   /// \todo Implement forgot-password
 });
 
+/** 
+ * Get a JSON object describing the current song. The object has at least the
+ * following fields:
+ * * name (string): The name of the updated song
+ * * artist_name (string)
+ * * album_name (string)
+ * * image_url (string): The URL of the album art for the song (or some other)
+ *  graphics to display while the song is playing)
+ *
+ * \param [query] token The user's auth token.
+ * \param [query] nid The ID of the network from which to request the data.
+ */
 app.get("/get-current-song", function(req, res) {
-  /// \todo Implement get-current-song
+  getData("networks/" + req.query.nid + "/queue", function(queue) {
+    songId = queue.front;
+    songData = queue.songId;
+
+    // The song ID is not stored with the rest of the data since it is the key
+    songData.song_id = songId;
+
+    res.send(songData);
+
+  }, auth=req.query.token);
+});
+
+/**
+ * Get the user's coin count for a given network.
+ * \param [query] token The user's auth token.
+ * \param [query] nid The ID of the network.
+ */
+app.get("/coins", function(req, res) {
+  var fb = new Firebase(DATABASE_URL);
+  fb.authWithCustomToken(req.query.token, function(error, authData) {
+    if (error) {
+      console.log("Invalid auth in /coins: " + error);
+    } else {
+      getData("users/" + authData.uid + "/networks/" + req.query.nid + "/coins",
+        function(coinCount) {
+          res.send(coinCount);
+        });
+    }
+  });
 });
 
 app.post("/search", function(req, res) {
@@ -232,9 +292,5 @@ app.post("/search", function(req, res) {
 app.post("/add-to-queue", function(req, res) {
   /// \todo Implement add-to-queue
 });
-
-app.get("/choose-network", function(req, res) {
-  /// \todo Implement choose-network
-}); 
 
 app.listen(8080);

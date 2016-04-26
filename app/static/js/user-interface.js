@@ -13,12 +13,12 @@
  * * song_id: an ID that can be used to get an audio stream for the song
  */
 function updateSongData(data, isAdmin=false) {
-  console.log("Updating song: " + data);
+  console.log("Updating song: " + JSON.stringify(data));
 
-  $("#current_song_title").text(data.name);
-  $("#current_artist_name").text(data.artist_name);
-  $("#current_album_name").text(data.album_name);
-  $("#current_album_art").src = data.image_url;
+  document.getElementById("current_song_title").innerHTML = data.name;
+  document.getElementById("current_artist_name").innerHTML = data.artist_name;
+  document.getElementById("current_album_name").innerHTML = data.album_name;
+  document.getElementById("current_album_art").src = data.image_url;
 
   if (isAdmin) {
       // If the user is an admin, get the stream audio
@@ -32,7 +32,7 @@ function updateSongData(data, isAdmin=false) {
 function updateCoinCount(newCount) {
   console.log("Updating coins: " + newCount);
 
-  $("#coins").innerHTML = newCount + "<i class=\"database icon\">\x3C/i>";
+  document.getElementById("coins").innerHTML = newCount + "<i class=\"database icon\">\x3C/i>";
 }
 
 // Update the page whenever data changes in the network with ID nid
@@ -98,28 +98,24 @@ function syncUpdate(nid) {
   console.log("Updating current song");
 
   // Update the song info
-  getData("networks/" + nid + "/queue", function(queue) {
-    var song_id = queue.front;
-    var songData = queue.song_id;
+  // get("/get-current-song", {
+  //   nid: nid,
+  //   token: user.token
+  // }, function(songData) {
+  //   updateSongData(songData);
 
-    // The song ID is not stored with the rest of the data since it is the key
-    songData.song_id = song_id;
-
-    updateSongData(songData);
-
-  }, function(error) {
-    console.log(error);
-  });
+  // }, function(error) {
+  //   console.log(error);
+  // });
   
 
-  console.log("Updating coin coint.");
+  // console.log("Updating coin coint.");
 
-  // Update the coin count
-  getData("users/" + user.uid + "/networks/" + nid + "/coins", function(count) {
-    updateCoinCount(coinCount);
-
-  }, function(error) {
-    console.log(error);
-  });
-  
+  // // Update the coin count
+  // get("get-coins", {
+  //   nid: nid,
+  //   token: user.token
+  // }, function(count) {
+  //   updateCoinCount(coinCount);
+  // });
 }
