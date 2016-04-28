@@ -89,33 +89,5 @@ function nextSong(nid) {
  * Synchronize with the given network and immediately update the data on the page.
  */
 function syncUpdate(nid) {
-
-  console.log("Syncing with network: " + nid);
-
-  // Listen for future changes on the network
   syncToNetwork(nid);
-
-  console.log("Updating current song");
-
-  // Update the song info
-  // get("/get-current-song", {
-  //   nid: nid,
-  //   token: user.token
-  // }, function(songData) {
-  //   updateSongData(songData);
-
-  // }, function(error) {
-  //   console.log(error);
-  // });
-  
-
-  // console.log("Updating coin coint.");
-
-  // // Update the coin count
-  // get("get-coins", {
-  //   nid: nid,
-  //   token: user.token
-  // }, function(count) {
-  //   updateCoinCount(coinCount);
-  // });
 }

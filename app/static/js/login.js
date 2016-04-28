@@ -1,6 +1,3 @@
-const FIREBASE_ROOT = "https://musichack16.firebaseio.com/";
-var firebase = new Firebase(FIREBASE_ROOT);
-
 /**
  * user: A JSON object describing the current user. Contains the following fields:
  * * uid: a unique user ID

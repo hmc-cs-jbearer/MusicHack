@@ -1,11 +1,9 @@
 {
 	"name" : "juke",
-	"version" : "0.0.1",
+	"version" : "0.0.2",
 	"dependencies" : {
-		"express" : "4.13.4",
+		"serve" : "1.4.0",
 		"firebase" : "2.4.2",
-		"nunjucks" : "2.4.2",
-		"body-paresr" : "1.15.0"
 	},
 
 	"repository" : {
