@@ -43,11 +43,9 @@ class Router {
       var queries = {};
       var match = queryPattern.exec(queryString);
       while(match) {
-        console.log(match);
         queries[match[1]] = match[2];
         match = queryPattern.exec(queryString);
       }
-      console.log(queries);
 
       this.handle(path, queries);
 

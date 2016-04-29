@@ -13,8 +13,6 @@
  * * song_id: an ID that can be used to get an audio stream for the song
  */
 function updateSongData(data, isAdmin=false) {
-  console.log("Updating song: " + JSON.stringify(data));
-
   document.getElementById("current_song_title").innerHTML = data.name;
   document.getElementById("current_artist_name").innerHTML = data.artist_name;
   document.getElementById("current_album_name").innerHTML = data.album_name;
@@ -30,8 +28,6 @@ function updateSongData(data, isAdmin=false) {
  * Change the number of coins displayed for the user's account.
  */
 function updateCoinCount(newCount) {
-  console.log("Updating coins: " + newCount);
-
   document.getElementById("coins").innerHTML = newCount + "<i class=\"database icon\">\x3C/i>";
 }
 
@@ -47,7 +43,7 @@ function syncToNetwork(nid) {
       return;
     }
 
-    var data = queue.child(song_id).val();
+    var data = queue.child(song_id).child("data").val();
 
     // The song ID is not stored with the rest of the data since it is the key
     data.song_id = song_id;
