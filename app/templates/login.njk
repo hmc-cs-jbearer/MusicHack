@@ -2,13 +2,11 @@
 
 {% block body %}
 
-{% if error %}
-<p style="color:red">{{ error }}</p>
-{% endif %}
+<span id="error" style="color:red">{{ error }}</span>
 
 <div class="ui form segment">
   <p>Welcome to Juke!</p>
-  <form id="loginForm" action="{{ continue }}" method="post">
+  <form>
     <div class="field">
       <label>Username</label>
       <input placeholder="Username" id="username" type="text">
@@ -17,7 +15,6 @@
       <label>Password</label>
       <input placeholder="Password" type="password" id="password">
     </div>
-    <input type="hidden" name="token" id="tokenOnSuccess"/>
     <div class="inline field">
       <button onclick="check()" type="button">Sign in</button>
     </div>
@@ -43,12 +40,11 @@
       password : document.getElementById("password").value
     }, function(error, userData) {
       if (error) {
-        window.location = '/login?continue={{ continue }}&error=Invalid+username+or+password.';
+        $("#error").innerHTML = 'Invalid username or password.';
         console.log("Error creating user:", error);
       } else {
         console.log("Successfully authenticated user account with token:", userData.token);
-        document.getElementById("tokenOnSuccess").value = userData.token;
-        document.getElementById("loginForm").submit();
+        window.location = "{{ continue }}";
       }
     });
   }

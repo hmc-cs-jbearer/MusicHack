@@ -41,6 +41,12 @@ function syncToNetwork(nid) {
   // Update the page when the current song changes
   firebase.child("networks/" + nid + "/queue").on("value", function (snapshot) {
     var song_id = snapshot.child("front").val();
+
+    if (!song_id) {
+      // No song currently playing
+      return;
+    }
+
     var data = snapshot.child(song_id).val();
 
     // The song ID is not stored with the rest of the data since it is the key

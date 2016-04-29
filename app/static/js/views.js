@@ -38,7 +38,7 @@ app.route("/", function(args) {
         });
         return;
       }
-
+      
       // Set the current context to the chosen network, or to the first
       // network in the user's networks if no network is specified.
       var nid;
@@ -62,5 +62,16 @@ app.route("/", function(args) {
   });
 });
 
-// Route the request to the proper handlers
-app.handleRequest();
+firebase.onAuth(function(data) {
+  if (data) {
+    // The user has an active session
+    user = data;
+
+    // Route the request to the proper handlers
+    app.handleRequest();
+
+  } else {
+    // Prompt the user to login and then return to this page
+    render("login.njk", {continue: window.location.href});
+  }
+});
