@@ -1,13 +1,26 @@
 {
   "firebase": "musichack16",
+
   "public": "app",
+
+  "rules": "firebase-rules.json",
+
   "ignore": [
     "firebase.json",
     "**/.*",
     "**/node_modules/**"
   ],
-  "rewrites": [ {
-    "source": "**",
-    "destination": "/index.html"
-  } ]
+
+  "redirects": [],
+
+  "rewrites": [
+    {
+      "source": "/login*",
+      "destination": "/static/html/login.html"
+    },
+    {
+      "source": "**",
+      "destination": "/static/html/index.html"
+    }
+  ]
 }

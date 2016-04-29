@@ -24,14 +24,8 @@ firebase.onAuth(function(authData) {
   if (authData) {
     console.log("Existing session found.");
     user = authData;
-
-    // Enable forms to use hidden inputs to pass token around
-    var tokenInputs = document.getElementsByName("token");
-    for (var i = 0; i < tokenInputs.length; i++) {
-      tokenInputs[i].value = user.token;
-    }
   } else {
-    console.log("Redirecting");
+    console.log("Redirecting to login");
     window.location = "/login?continue=" + window.location;
   }
 });

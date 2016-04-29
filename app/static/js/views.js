@@ -5,17 +5,7 @@
  * everything that happens here will slow down the page load.
  */
 
-var app = new Router();
-nunjucks.configure("templates");
-
-var user;
-
-// Helper functions
-
-// Render a template
-function render(template, context) {
-  document.write(nunjucks.render(template, context));
-}
+var app = new Router("templates");
 
 // Endpoints
 
@@ -24,7 +14,7 @@ app.route("/", function(args) {
   getData("users/" + user.uid + "/networks", function(networks) {
     if (!networks) {
       // The user is not yet subscribed to any networks
-      render("user.njk", {
+      app.render("user.njk", {
         networks: {}
       });
       return;
@@ -47,7 +37,7 @@ app.route("/", function(args) {
         networks[id].name = allNetworks[id].name;
       }
 
-      render("user.njk", {
+      app.render("user.njk", {
         // An object containing information about the user's networks
         networks: networks,
 
@@ -61,16 +51,4 @@ app.route("/", function(args) {
   });
 });
 
-firebase.onAuth(function(data) {
-  if (data) {
-    // The user has an active session
-    user = data;
-
-    // Route the request to the proper handlers
-    app.handleRequest();
-
-  } else {
-    // Prompt the user to login and then return to this page
-    render("login.njk", {continue: window.location.href});
-  }
-});
+app.handleRequest();

@@ -10,4 +10,4 @@ if "%~1"=="-FIXED_CTRL_C" (
    GOTO :EOF
 )
 
-serve
+firebase serve
