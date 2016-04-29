@@ -18,15 +18,20 @@ var user = null;
  *  for later use by the page.
  */
 firebase.onAuth(function(authData) {
+
+  console.log("Attempting login.");
+
   if (authData) {
+    console.log("Existing session found.");
     user = authData;
 
     // Enable forms to use hidden inputs to pass token around
     var tokenInputs = document.getElementsByName("token");
-      for (var i = 0; i < tokenInputs.length; i++) {
-        tokenInputs[i].value = user.token;
-      }
-    } else {
-      window.location = "/login?continue=" + window.location;
+    for (var i = 0; i < tokenInputs.length; i++) {
+      tokenInputs[i].value = user.token;
+    }
+  } else {
+    console.log("Redirecting");
+    window.location = "/login?continue=" + window.location;
   }
 });

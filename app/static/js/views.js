@@ -6,14 +6,60 @@
  */
 
 var app = new Router();
-
 nunjucks.configure("templates");
+
+var user;
+
+// Helper functions
+
+// Render a template
 function render(template, context) {
   document.write(nunjucks.render(template, context));
 }
 
+// Get user data from Firebase
+function login(onSuccess) {
+  firebase.onAuth(function(data) {
+    user = data;
+    onSuccess();
+  });
+}
+
 app.route("/", function(args) {
-  render("login.njk", {continue:"/"});
+  console.log("hello");
+  login(function() {
+
+    getData("users/" + user.uid + "/networks", function(networks) {
+
+      if (!networks) {
+        // The user is not yet subscribed to any networks
+        render("user.njk", {
+          networks: {}
+        });
+        return;
+      }
+
+      // Set the current context to the chosen network, or to the first
+      // network in the user's networks if no network is specified.
+      var nid;
+      if (args && args.nid) {
+        nid = args.nid;
+      } else {
+        nid = Object.keys(networks)[0];
+      }
+
+      render("user.njk", {
+        // An object containing information about the user's networks
+        networks: networks,
+
+        current: networks[nid],
+
+        // The ID of the current network context to display on the user's page
+        nid: nid
+
+      });
+    });
+  });
 });
 
 // Route the request to the proper handlers

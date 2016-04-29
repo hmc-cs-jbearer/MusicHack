@@ -8,14 +8,15 @@ var firebase = new Firebase(FIREBASE_ROOT);
  */
 function getData(path, onSuccess) {
 
-  var reqUrl = FIREBASE_ROOT + path;
+  var reqUrl = FIREBASE_ROOT + path + ".json";
 
   $.getJSON(reqUrl, {
     auth: user.token
   }, onSuccess)
 
   .fail(function(jqXHR, status, error) {
-    var message = "Tried to GET from " + reqUrl + ", but encountered error:\n";
+    var message = "Tried to GET from " + reqUrl + "with token " + user.token + 
+      ", but encountered error:\n";
     if (status) {
       message += (status + ".");
     }
