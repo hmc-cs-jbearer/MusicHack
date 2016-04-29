@@ -25,7 +25,7 @@ class Router {
      * data is a JSON object which is given to the handlers.
      */
     handle(endpoint, data) {
-      this.endpoints[endpoint].forEach((handler) => handler());
+      this.endpoints[endpoint].forEach((handler) => handler(data));
     }
 
     /**
@@ -37,16 +37,17 @@ class Router {
       // Parse the url to get the path and the queries
       var path = location.pathname;
 
-      /// \todo This isn't working; queries always ends up undefined
       // Match key=val pairs
       var queryPattern = /([^=&\?]+)=([^=&\?]+)/g;
       var queryString = location.search;
       var queries = {};
       var match = queryPattern.exec(queryString);
       while(match) {
+        console.log(match);
         queries[match[1]] = match[2];
         match = queryPattern.exec(queryString);
       }
+      console.log(queries);
 
       this.handle(path, queries);
 

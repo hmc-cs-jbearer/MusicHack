@@ -20,6 +20,9 @@ function render(template, context) {
 // Endpoints
 
 app.route("/", function(args) {
+
+  console.log("args: ", args);
+
   getData("users/" + user.uid + "/networks", function(networks) {
     if (!networks) {
       // The user is not yet subscribed to any networks
