@@ -37,6 +37,7 @@ class Router {
       // Parse the url to get the path and the queries
       var path = location.pathname;
 
+      /// \todo This isn't working; queries always ends up undefined
       // Match key=val pairs
       var queryPattern = /([^=&\?]+)=([^=&\?]+)/g;
       var queryString = location.search;

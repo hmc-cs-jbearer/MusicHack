@@ -43,10 +43,10 @@
 
     {% for id, network in networks %}
     <a class="item">
-      <form action="/" method="post">
+      <form action="/" method="get">
         <input type="hidden" name="nid" value="{{ id }}"/>
         <button class = "fluid ui button" type="submit">
-          {{network.name}}
+          {{ network.name }}
         </button>
       </form>
     </a>

@@ -40,7 +40,7 @@
       password : document.getElementById("password").value
     }, function(error, userData) {
       if (error) {
-        $("#error").innerHTML = 'Invalid username or password.';
+        document.getElementById("error").innerHTML = 'Invalid username or password.';
         console.log("Error creating user:", error);
       } else {
         console.log("Successfully authenticated user account with token:", userData.token);

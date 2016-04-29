@@ -17,35 +17,33 @@ function render(template, context) {
   document.write(nunjucks.render(template, context));
 }
 
-// Get user data from Firebase
-function login(onSuccess) {
-  firebase.onAuth(function(data) {
-    user = data;
-    onSuccess();
-  });
-}
+// Endpoints
 
 app.route("/", function(args) {
-  console.log("hello");
-  login(function() {
+  getData("users/" + user.uid + "/networks", function(networks) {
+    if (!networks) {
+      // The user is not yet subscribed to any networks
+      render("user.njk", {
+        networks: {}
+      });
+      return;
+    }
 
-    getData("users/" + user.uid + "/networks", function(networks) {
+    // Set the current context to the chosen network, or to the first
+    // network in the user's networks if no network is specified.
+    var nid;
+    if (args && args.nid) {
+      nid = args.nid;
+    } else {
+      nid = Object.keys(networks)[0];
+    }
 
-      if (!networks) {
-        // The user is not yet subscribed to any networks
-        render("user.njk", {
-          networks: {}
-        });
-        return;
-      }
-      
-      // Set the current context to the chosen network, or to the first
-      // network in the user's networks if no network is specified.
-      var nid;
-      if (args && args.nid) {
-        nid = args.nid;
-      } else {
-        nid = Object.keys(networks)[0];
+    // The names of the networks are stored with the networks themselves,
+    // we use the IDs from the user's networks to key into them
+    getData("networks", function(allNetworks) {
+
+      for (var id in networks) {
+        networks[id].name = allNetworks[id].name;
       }
 
       render("user.njk", {
