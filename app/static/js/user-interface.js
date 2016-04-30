@@ -26,6 +26,7 @@ function updateSongData(data, isAdmin=false) {
 
 /**
  * Change the number of coins displayed for the user's account.
+ * \todo Incompatible with the new upvote/downvote system
  */
 function updateCoinCount(newCount) {
   document.getElementById("coins").innerHTML = newCount + "<i class=\"database icon\">\x3C/i>";
@@ -59,46 +60,41 @@ function syncToNetwork(nid) {
 
 // Upvote the current song on the network with ID nid
 function upvote(nid) {
- var queuePath = "networks/" + nid + "/queue/";
-
+  var queuePath = "networks/" + nid + "/queue/";
+ 
   // get the queue
   getData(queuePath, function(queue) {   
 
     var songId = queue.front;
     var song = queue[songId];
 
-    // make sure the user can only upvote the song once
-    for (var upvoter in song.upvoters) {
-      if (user.uid == upvoter) {
-        return;
-      }
-    }
+    // Add the user to the list of people who upvoted the current song
+    song.upvoters[user.uid] = "value";
 
-    var requester = song.requester;
-    var networkPath = "users/" + requester + "/networks/" + nid;
+    // Just in case the user had previously downvoted, remove them from that list
+    song.downvoters[user.uid] = null;
 
-    // Increment the requester's coins
-    getData(networkPath, function(network) {
-
-      /// \todo Better algorithm for how upvotes affect coins
-      /// \todo This is a vulnerability. The client could change this code and
-      /// cause upvote to increment by whatever they want.
-      network.coins += 1;
-
-      setData(networkPath, network);
-      setData(queuePath + songId + "/upvoters/" + user.uid, "value");
-
-    });
+    setData(queuePath + songId, song);
   });
 }
 
 // Downvote the current song on the network with ID nid
 function downvote(nid) {
-  $.ajax("/downvote", {
-    data : {
-      nid: nid,
-      token: user.token
-    }
+  var queuePath = "networks/" + nid + "/queue/";
+ 
+  // get the queue
+  getData(queuePath, function(queue) {   
+
+    var songId = queue.front;
+    var song = queue[songId];
+
+    // Add the user to the list of people who downvoted the current song
+    song.downvoters[user.uid] = "value";
+
+    // Just in case the user had previously upvoted, remove them from that list
+    song.upvoters[user.uid] = null;
+
+    setData(queuePath + songId, song);
   });
 }
 
