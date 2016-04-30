@@ -59,11 +59,36 @@ function syncToNetwork(nid) {
 
 // Upvote the current song on the network with ID nid
 function upvote(nid) {
-  $.ajax("/upvote", {
-    data : {
-      nid: nid,
-      token: user.token
+ var queuePath = "networks/" + nid + "/queue/";
+
+  // get the queue
+  getData(queuePath, function(queue) {   
+
+    var songId = queue.front;
+    var song = queue[songId];
+
+    // make sure the user can only upvote the song once
+    for (var upvoter in song.upvoters) {
+      if (user.uid == upvoter) {
+        return;
+      }
     }
+
+    var requester = song.requester;
+    var networkPath = "users/" + requester + "/networks/" + nid;
+
+    // Increment the requester's coins
+    getData(networkPath, function(network) {
+
+      /// \todo Better algorithm for how upvotes affect coins
+      /// \todo This is a vulnerability. The client could change this code and
+      /// cause upvote to increment by whatever they want.
+      network.coins += 1;
+
+      setData(networkPath, network);
+      setData(queuePath + songId + "/upvoters/" + user.uid, "value");
+
+    });
   });
 }
 
