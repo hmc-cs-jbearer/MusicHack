@@ -57,44 +57,49 @@ function syncToNetwork(nid) {
   });
 }
 
-// Upvote the current song on the network with ID nid
-function upvote(nid) {
+/**
+ * Either upvote or downvot the current song on the network with the given ID.
+ * addList: either "upvoters" or "downvoters", the list to add a vote to
+ * removeList: the complement of addlist (ie either "downvoters" or "upvoters")
+ */
+function vote(nid, addList, removeList) {
   var queuePath = "/networks/" + nid + "/queue";
 
   // get the queue
-  getData(queuePath, function(queue) {   
+  getData(queuePath, function(queue) {
+    if (!queue) {
+      // No song playing right now
+      return;
+    }   
 
     var songId = queue.front;
     var song = queue[songId];
 
-    // Add the user to the list of people who upvoted the current song
-    song.upvoters[user.uid] = "value";
+    if (!song[addList]) {
+      // Create a list of people who have voted this way
+      song[addList] = {};
+    }
+    // Add the user to the list
+    song[addList][user.uid] = 1;
 
-    // Just in case the user had previously downvoted, remove them from that list
-    song.downvoters[user.uid] = null;
+    if (song[removeList]) {
+      // Just in case the user has already voted and is changing their vote,
+      // remove them from the other list
+      song[removeList][user.uid] = null;
+    }
 
-    setData(queuePath + songId, song);
+    setData(queuePath + "/" + songId, song);
   });
+}
+
+// Upvote the current song on the network with ID nid
+function upvote(nid) {
+  vote(nid, "upvoters", "downvoters");
 }
 
 // Downvote the current song on the network with ID nid
 function downvote(nid) {
-  var queuePath = "/networks/" + nid + "/queue";
- 
-  // get the queue
-  getData(queuePath, function(queue) {   
-
-    var songId = queue.front;
-    var song = queue[songId];
-
-    // Add the user to the list of people who downvoted the current song
-    song.downvoters[user.uid] = "value";
-
-    // Just in case the user had previously upvoted, remove them from that list
-    song.upvoters[user.uid] = null;
-
-    setData(queuePath + songId, song);
-  });
+  vote(nid, "downvoters", "upvoters");
 }
 
 // Advance the network with ID nid to the next song in the queue
