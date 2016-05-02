@@ -1,7 +1,7 @@
 {
   "firebase": "musichack16",
 
-  "public": "app",
+  "public": "www",
 
   "rules": "firebase-rules.json",
 

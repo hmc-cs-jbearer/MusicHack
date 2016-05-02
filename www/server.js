@@ -303,4 +303,6 @@ app.get("/coins", function(req, res) {
   });
 });
 
-app.listen(8080);
+app.listen(8080, function() {
+  console.log("Listening at port 8080.");
+});

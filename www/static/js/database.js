@@ -1,4 +1,4 @@
-const FIREBASE_ROOT = "https://musichack16.firebaseio.com/";
+const FIREBASE_ROOT = "https://musichack16.firebaseio.com";
 var firebase = new Firebase(FIREBASE_ROOT);
 
 /**
@@ -7,6 +7,13 @@ var firebase = new Firebase(FIREBASE_ROOT);
  * an erro message is logged.
  */
 function getData(path, onSuccess) {
+
+  var e = new Error('dummy');
+  var stack = e.stack.replace(/^[^\(]+?[\n$]/gm, '')
+      .replace(/^\s+at\s+/gm, '')
+      .replace(/^Object.<anonymous>\s*\(/gm, '{anonymous}()@')
+      .split('\n');
+  console.log(stack);
 
   var reqUrl = FIREBASE_ROOT + path + ".json";
 

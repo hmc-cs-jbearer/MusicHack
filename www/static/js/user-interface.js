@@ -26,7 +26,6 @@ function updateSongData(data, isAdmin=false) {
 
 /**
  * Change the number of coins displayed for the user's account.
- * \todo Incompatible with the new upvote/downvote system
  */
 function updateCoinCount(newCount) {
   document.getElementById("coins").innerHTML = newCount + "<i class=\"database icon\">\x3C/i>";
@@ -60,8 +59,8 @@ function syncToNetwork(nid) {
 
 // Upvote the current song on the network with ID nid
 function upvote(nid) {
-  var queuePath = "networks/" + nid + "/queue/";
- 
+  var queuePath = "/networks/" + nid + "/queue";
+
   // get the queue
   getData(queuePath, function(queue) {   
 
@@ -80,7 +79,7 @@ function upvote(nid) {
 
 // Downvote the current song on the network with ID nid
 function downvote(nid) {
-  var queuePath = "networks/" + nid + "/queue/";
+  var queuePath = "/networks/" + nid + "/queue";
  
   // get the queue
   getData(queuePath, function(queue) {   

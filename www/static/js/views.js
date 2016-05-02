@@ -11,7 +11,7 @@ var app = new Router("templates");
 
 app.route("/", function(args) {
   
-  getData("users/" + user.uid + "/networks", function(networks) {
+  getData("/users/" + user.uid + "/networks", function(networks) {
     if (!networks) {
       // The user is not yet subscribed to any networks
       app.render("user.njk", {
@@ -31,7 +31,7 @@ app.route("/", function(args) {
 
     // The names of the networks are stored with the networks themselves,
     // we use the IDs from the user's networks to key into them
-    getData("networks", function(allNetworks) {
+    getData("/networks", function(allNetworks) {
 
       for (var id in networks) {
         networks[id].name = allNetworks[id].name;

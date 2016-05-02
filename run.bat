@@ -10,4 +10,8 @@ if "%~1"=="-FIXED_CTRL_C" (
    GOTO :EOF
 )
 
+cd backend
+start node firebase-client.js
+
+cd ..
 firebase serve
