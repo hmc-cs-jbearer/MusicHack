@@ -15,7 +15,7 @@ app.route("/", function(args) {
     if (!networks) {
       // The user is not yet subscribed to any networks
       app.render("user.njk", {
-        networks: {}
+        networks: []
       });
       return;
     }
@@ -29,24 +29,11 @@ app.route("/", function(args) {
       nid = Object.keys(networks)[0];
     }
 
-    // The names of the networks are stored with the networks themselves,
-    // we use the IDs from the user's networks to key into them
-    getData("/networks", function(allNetworks) {
+    app.render("user.njk", {
+      // An object containing information about the user's networks
+      networks: Object.keys(networks),
 
-      for (var id in networks) {
-        networks[id].name = allNetworks[id].name;
-      }
-
-      app.render("user.njk", {
-        // An object containing information about the user's networks
-        networks: networks,
-
-        current: networks[nid],
-
-        // The ID of the current network context to display on the user's page
-        nid: nid
-
-      });
+      current: nid,
     });
   });
 });
@@ -59,7 +46,7 @@ app.route("/new-network", function() {
   app.render("new-network.njk");
 });
 
-app.route("/enter-network", function() {
+app.route("/join-network", function() {
   app.render("join-network.njk");
 });
 

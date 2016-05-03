@@ -60,6 +60,22 @@ function getData(path, callback) {
   });
 }
 
+app.get("/forgot-password", function(req, res) {
+  /// \todo Implement forgot-password
+});
+
+app.post("/search", function(req, res) {
+  /// \todo Implement search
+});
+
+app.post("/add-to-queue", function(req, res) {
+  /// \todo Implement add-to-queue
+});
+
+////////////////////////////////////////////////////////////////////////////////
+// The below functions have been deprecated and their logic moved to the client
+////////////////////////////////////////////////////////////////////////////////
+
 /*
 * \brief    Adds a user to a network
 * \details  Checks if the network exists.  If it does, adds the user to the network
@@ -70,7 +86,7 @@ function getData(path, callback) {
 * \TODO     Make sure you can't add yourself to a network your already admin/user
 */
 app.post("/join-network", function(req, res) {
-	var network_name = req.body.name;
+  var network_name = req.body.name;
   var token = req.body.token;
 
   console.log(token);
@@ -113,24 +129,6 @@ app.post("/join-network", function(req, res) {
 
   /// \todo Implement join-network
 });
-
-
-
-app.get("/forgot-password", function(req, res) {
-  /// \todo Implement forgot-password
-});
-
-app.post("/search", function(req, res) {
-  /// \todo Implement search
-});
-
-app.post("/add-to-queue", function(req, res) {
-  /// \todo Implement add-to-queue
-});
-
-////////////////////////////////////////////////////////////////////////////////
-// The below functions have been deprecated and their logic moved to the client
-////////////////////////////////////////////////////////////////////////////////
 
 /*
 * \brief    Creates a new network

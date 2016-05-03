@@ -1,20 +1,26 @@
-{% extends "private-view.njk" %} {% block title %}Join a network{% endblock %}
+{% extends "private-view.njk" %}
 
+{% block title %}Join a network{% endblock %}
 
 {% block body %}
 
 <div class="ui form segment">
-  <form action="/join-network" method="post">
-    <p>Connect to a new network</p>
-    <div class="field">
-      <label>Enter the name of the network you would like to join</label>
-      <input name="name" placeholder="WIBSTR" id="email" type="text"/>
-    </div>
-    <input type="hidden" name="token"/>
-    <div class="inline field">
-      <button type="submit"> Add Network </button>
-    </div>
-  </form>
+  <span id="error" style="color:red"></span>
+  <p>Connect to a new network</p>
+  <div class="field">
+    <label>Enter the name of the network you would like to join</label>
+    <input placeholder="WIBSTR" id="networkName" type="text"/>
+  </div>
+  <div class="inline field">
+    <button onclick="joinNetwork()"> Join Network </button>
+  </div>
 </div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+
+<script src="/static/js/networks.js"></script>
 
 {% endblock %}

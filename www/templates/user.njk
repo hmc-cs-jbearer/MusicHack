@@ -3,19 +3,18 @@
 {% block body %}
 
 <div style = "text-align:right ">
+  <form action="/new-network">
+    <button type="submit">Create New Network </button>
+  </form>
 
-  <a href="/new-network">
-    <button type="button">Create New Newtork </button>
-  </a>
-
-  <a href="/enter-network">
+  <form action="/join-network">
     <button type="submit"> Join a Network </button>
-  </a>
+  </form>
 
   <button type="button" onclick="logout()">Logout</button>
 
   <form action="/switch-google" method="post">
-    <input type="hidden" name="nid" value="{{ nid }}"/>
+    <input type="hidden" name="nid" value="{{ current }}"/>
     <a class="item">
       <button type="submit"> Switch Google accounts </button>
     </a>
@@ -27,7 +26,7 @@
 </div>
 
 <form action="/search" method="post">
-  <input name="nid" type="hidden" value="{{ nid }}"/>
+  <input name="nid" type="hidden" value="{{ current }}"/>
   <div class="ui huge icon input">
     <i class="search icon"></i>
     <input name="query" type="text" placeholder="Search for a song... "/>
@@ -41,19 +40,19 @@
       Networks
     </a>
 
-    {% for id, network in networks %}
+    {% for network in networks %}
     <a class="item">
       <form action="/" method="get">
-        <input type="hidden" name="nid" value="{{ id }}"/>
+        <input type="hidden" name="nid" value="{{ network }}"/>
         <button class = "fluid ui button" type="submit">
-          {{ network.name }}
+          {{ network }}
         </button>
       </form>
     </a>
     {% endfor %}
   </div>
   <div class = "ui centered label">
-    Music for {{ current.name }}
+    Music for {{ current }}
   </div>
   <div class="pusher">
     <div class="ui basic segment">
@@ -67,10 +66,10 @@
             <span id="current_artist_name"></span> 
             <br>
             <span id="current_album_name"></span>
-            <button onclick="upvote('{{ nid }}')" class="ui icon button">
+            <button onclick="upvote('{{ current }}')" class="ui icon button">
               <i class="right floated thumbs up icon"></i>
             </button>
-            <button onclick="downvote('{{ nid }}')" class="ui icon button">
+            <button onclick="downvote('{{ current }}')" class="ui icon button">
               <i class="left floated thumbs down icon"></i>
             </button>
           </div>
@@ -81,7 +80,7 @@
 
   {% if current.is_admin %}
   <div class = "play music centered">
-    <audio id="player" controls="controls" autoplay="true" onended="nextSong({{ nid }})">
+    <audio id="player" controls="controls" autoplay="true" onended="nextSong({{ current }})">
       Your browser does not support the audio element.
     </audio>
   </div>
@@ -98,7 +97,7 @@
 
 <script src="/static/js/user-interface.js"></script>
 <script type="text/javascript">
-  syncUpdate("{{ nid }}");
+  syncUpdate("{{ current }}");
 </script>
 
 {% endblock %}
