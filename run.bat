@@ -14,4 +14,4 @@ cd backend
 start node firebase-client.js > log.txt
 
 cd ..
-firebase serve
+npm start
