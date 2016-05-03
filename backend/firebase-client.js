@@ -16,41 +16,27 @@ var firebase = new Firebase(FIREBASE_ROOT);
 /**
  * Update the song requester's coin count when a user upvotes or downvotes the
  *  song.
+ * song: a data snapshot of the current song
+ * requesterNetwork: a reference to the requester of the song's data for the
+ *  relevant network.
  */
-function vote(song) {
+function vote(song, requesterNetwork) {
 
-  // Get the network ID so we can acces the user's data for the network
-  // Hierarchy is network->queue->song, and network key is nid
-  var nid = song.ref().parent().parent().key();
-
-  // Get the requester of the song
-  var requesterID = song.child("requester").val();
-  var requester = firebase.child("users").child(requesterID);
-  var network = requester.child("networks").child(nid);
-
+  // Get the upvotes and downvotes
   var upvoters = song.child("upvoters").val();
   var downvoters = song.child("downvoters").val();
-
-  // Get the list of upvoters and downvoters
   var numUpvotes = upvoters ? Object.keys(upvoters).length : 0;
   var numDownvotes = downvoters ? Object.keys(downvoters).length : 0;
 
-  // Delta keeps track of how much this song has changed the coin count
-  var delta = song.child("coinDelta").val();
+  // Compute the change in the coin count due to this song
+  var delta = calculateCoinDelta(numUpvotes, numDownvotes);
 
-  // Compute the coin delta accounting for the new vote
-  var newDelta = calculateCoinDelta(numUpvotes, numDownvotes);
+  // Update the user's coin count
+  var coinsBeforeSong = song.child("coinsBeforeSong").val();
+  requesterNetwork.child("coins").set(coinsBeforeSong + delta);
 
-  // Update the user's coin count to account for the new delta
-  network.child("coins").once("value", function(coins) {
-    var coinsBeforeSong = coins.val() - delta;
-    network.child("coins").set(coinsBeforeSong + newDelta);
-
-    // Update the coin delta and the requester's coin count
-    song.child("coinDelta").ref().set(newDelta);
-    
-    console.log("Vote cast on song", song.key(), "in network", nid);
-  });
+  console.log("Vote cast for song", song.child("data/name").val(),
+    "on network", requesterNetwork.key());
 }
 
 /**
@@ -62,12 +48,41 @@ function nextSong(queue, songId) {
     return;
   }
 
-  // Keep track of how much this song has changed the requester's coin count
-  // Starts at 0 with no upvotes or downvotes
-  queue.child(songId).child("coinDelta").set(0);
+  var song = queue.child(songId);
 
-  // Listen for changes in the upvote/downvote list for the new song
-  queue.child(songId).on("value", vote);
+  // Get the network ID so we can acces the user's data for the network
+  // Hierarchy is network->queue->song, and the key for the network is its ID
+  var nid = song.parent().parent().key();
+
+  // Get the requester's data for the network of the song
+  song.child("requester").once("value", function(requesterID) {
+    var requester = firebase.child("users").child(requesterID.val());
+    var network = requester.child("networks").child(nid);
+
+    // Here we check if coinsBeforeSong has been set. If not, this song is just
+    // starting and we need to set it. If it is set, it means the song has
+    // already been playing, and the server has just started. In that case we
+    // keep the old value.
+    song.child("coinsBeforeSong").once("value", function(coinsBeforeSong) {
+      if (coinsBeforeSong) {
+        // Get the user's coin count
+        network.child("coins").once("value", function(coins) {
+          song.child("coinsBeforeSong").set(coins.val());
+
+          // Only assign listeners after coinsBeforeSong has been set
+          song.on("value", function(song) {
+            vote(song, network);   
+          });
+
+        });
+      } else {
+        // Listen for changes in the upvote/downvote list for the new song
+        song.on("value", function(song) {
+          vote(song, network);
+        });
+      }
+    });
+  });
 }
 
 /**
