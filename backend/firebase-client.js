@@ -18,53 +18,64 @@ var firebase = new Firebase(FIREBASE_ROOT);
  *  song.
  */
 function vote(song) {
-  var upvoters = song.child("upvoters").val();
-  var downvoters = song.child("downvoters").val();
-
-  // Get the list of upvoters and downvoters
-  var numUpvotes = Object.keys(upvoters).length;
-  var numDownvotes = Object.keys(downvoters).length;
 
   // Get the network ID so we can acces the user's data for the network
   // Hierarchy is network->queue->song, and network key is nid
-  var nid = song.parent().parent().key();
+  var nid = song.ref().parent().parent().key();
 
   // Get the requester of the song
   var requesterID = song.child("requester").val();
   var requester = firebase.child("users").child(requesterID);
   var network = requester.child("networks").child(nid);
 
+  var upvoters = song.child("upvoters").val();
+  var downvoters = song.child("downvoters").val();
+
+  // Get the list of upvoters and downvoters
+  var numUpvotes = upvoters ? Object.keys(upvoters).length : 0;
+  var numDownvotes = downvoters ? Object.keys(downvoters).length : 0;
+
   // Delta keeps track of how much this song has changed the coin count
   var delta = song.child("coinDelta").val();
-  var coinsBeforeSong = network.child("coins").val() - delta;
 
   // Compute the coin delta accounting for the new vote
   var newDelta = calculateCoinDelta(numUpvotes, numDownvotes);
 
-  // Update the coin delta and the requester's coin count
-  song.child("coinDelta").set(newDelta);
-  network.child("coins").set(coinsBeforeSong + newDelta);
+  // Update the user's coin count to account for the new delta
+  network.child("coins").once("value", function(coins) {
+    var coinsBeforeSong = coins.val() - delta;
+    network.child("coins").set(coinsBeforeSong + newDelta);
 
+    // Update the coin delta and the requester's coin count
+    song.child("coinDelta").ref().set(newDelta);
+    
+    console.log("Vote cast on song", song.key(), "in network", nid);
+  });
 }
 
 /**
  * Sync listeners with next song and clean up data from old song
  */
 function nextSong(queue, songId) {
-  // Listen for changes in the upvote/downvote list for the new songs
-  queue.child(songId).child("upvoters").on("value", vote);
-  queue.child(songId).child("downvoters").on("value", vote);
+  if (!songId) {
+    // No song playing right now
+    return;
+  }
 
   // Keep track of how much this song has changed the requester's coin count
   // Starts at 0 with no upvotes or downvotes
   queue.child(songId).child("coinDelta").set(0);
+
+  // Listen for changes in the upvote/downvote list for the new song
+  queue.child(songId).on("value", vote);
 }
 
 /**
  * Set up listeners to handle changes in the data for a single network.
  */
 function syncToNetwork(network) {
-  var queue = network.child(queue);
+  // Get a reference to the queue for this network
+  var queue = network.ref().child("queue");
   queue.child("front").on("value", function(newFront) {
     // Listen for changes to the current song
     nextSong(queue, newFront.val());

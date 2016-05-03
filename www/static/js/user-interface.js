@@ -52,8 +52,8 @@ function syncToNetwork(nid) {
   });
 
   // Update the page when the user's coin count changes
-  firebase.child("users/" + user.uid + "/networks/" + nid + "/coins").on("value", function(snapshot) {
-    updateCoinCount(snapshot.val());
+  firebase.child("users/" + user.uid + "/networks/" + nid + "/coins").on("value", function(coins) {
+    updateCoinCount(coins.val());
   });
 }
 
