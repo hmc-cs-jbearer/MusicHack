@@ -51,4 +51,16 @@ app.route("/", function(args) {
   });
 });
 
+app.route("/create-account", function() {
+  app.render("register.njk");
+});
+
+app.route("/new-network", function() {
+  app.render("new-network.njk");
+});
+
+app.route("/enter-network", function() {
+  app.render("join-network.njk");
+});
+
 app.handleRequest();

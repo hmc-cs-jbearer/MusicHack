@@ -49,19 +49,40 @@ function getData(path, onSuccess) {
  * is called if provided. The callback gets no arguments.
  */
 function setData(path, data, callback) {
-  var reqUrl = FIREBASE_ROOT + path;
 
   // Capture the stack trace in case of error
   var trace = stackTrace();
 
   firebase.child(path).set(data, function(error) {
     if (error) {
-      console.log("Tried to set data at " + reqUrl + " , but encountered error:");
+      console.log("Tried to set data at " + path + " , but encountered error:");
       console.log(error + ".");
       console.log("Traceback:", trace);
     }
     else if (callback) {
       callback();
+    }
+  });
+}
+
+/**
+ * Create a new child with a unique key at path and store data there.
+ * Upon success, the callback function is called and given the new key as an
+ * argument.
+ */
+function pushData(path, data, callback) {
+  // Capture the stack trace in case of error
+  var trace = stackTrace();
+
+  var ref = firebase.child(path).push(data, function(error) {
+    console.log("callback");
+    if (error) {
+      console.log("Tried to push data at " + path + " , but encountered error:");
+      console.log(error + ".");
+      console.log("Traceback:", trace);
+    }
+    else if (callback) {
+      callback(ref.key());
     }
   });
 }

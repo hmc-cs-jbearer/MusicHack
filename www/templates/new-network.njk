@@ -1,20 +1,25 @@
-{% extends "private-view.njk" %} {% block title %}Add new network{% endblock %}
+{% extends "private-view.njk" %}
+
+{% block title %}Add new network{% endblock %}
 
 {% block body %}
 
 <div class="ui form segment">
-  <form action="/add-network" method="post">
-    <p>Please enter the network's name</p>
-    <div class="field">
-      <label>Network</label>
-      <input name="name" placeholder="WIBSTR" id="email" type="text"/>
-    </div>
-  <input type="hidden" name="token"/>
-    <div class="inline field">
-    <button type="submit"> Add Network </button>
-    </div>
-  </form>
-
+  <p>Please enter the network's name</p>
+  <div class="field">
+    <label>Network</label>
+    <input name="name" placeholder="WIBSTR" id="networkName" type="text"/>
+  </div>
+  <div class="inline field">
+    <button onclick="addNetwork()"> Add Network </button>
+  </div>
 </div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+
+<script src="/static/js/networks.js"></script>
 
 {% endblock %}

@@ -60,68 +60,6 @@ function getData(path, callback) {
   });
 }
 
-
-// creating a new account
-app.get("/create-account", function(req, res) {
-  res.send(templates.render("register.njk"));
-});
-
-
-app.get("/new-network", function(req,res) {
-  res.send(templates.render("new-network.njk"));
-});
-
-/*
-* \brief    Creates a new network
-* \details  Creates a new network, with the user as admin.
-*           and updates the user's list of networks.
-*           If the network already exists, then this action does nothing
-* \TODO     Add meaningful error message if network exists
-*/
-app.post("/add-network", function(req, res) {
-
-  token = req.body.token;
-  network_name = req.body.name;
-
-  var firebase = new Firebase(DATABASE_URL);
-  firebase.authWithCustomToken(token, function(error, authData) {
-    if (error) {
-      console.log("Authentication failed!", error);
-    } else {
-      console.log("Authenticated successfully with payload:", authData);
-    }
-
-    // add the network to the user's list of networks making them admin
-		var userNetworksRef =
-      firebase.child("users").child(authData.uid).child("networks").child(network_name);
-
-		userNetworksRef.set({
-      coins: 5,
-      is_admin: "true"
-		});
-		
-    // add the user to the network's admins and users
-		var networksRef = firebase.child("networks").child(network_name);
-		networksRef.set({
-			"admins": authData.uid,
-		});
-
-    networksRef.child("users").child(authData.uid).set("value");
-
-
-
-	}); //end authWithCustomToken
-
-
-  res.send(templates.render("user.njk"));
-}); //end add-network\
-
-/// Send user to "join network" page
-app.get("/enter-network", function(req, res) {
-	res.send(templates.render("join-network.njk"));
-});
-
-
 /*
 * \brief    Adds a user to a network
 * \details  Checks if the network exists.  If it does, adds the user to the network
@@ -193,6 +131,65 @@ app.post("/add-to-queue", function(req, res) {
 ////////////////////////////////////////////////////////////////////////////////
 // The below functions have been deprecated and their logic moved to the client
 ////////////////////////////////////////////////////////////////////////////////
+
+/*
+* \brief    Creates a new network
+* \details  Creates a new network, with the user as admin.
+*           and updates the user's list of networks.
+*           If the network already exists, then this action does nothing
+* \TODO     Add meaningful error message if network exists
+*/
+app.post("/add-network", function(req, res) {
+
+  token = req.body.token;
+  network_name = req.body.name;
+
+  var firebase = new Firebase(DATABASE_URL);
+  firebase.authWithCustomToken(token, function(error, authData) {
+    if (error) {
+      console.log("Authentication failed!", error);
+    } else {
+      console.log("Authenticated successfully with payload:", authData);
+    }
+
+    // add the network to the user's list of networks making them admin
+    var userNetworksRef =
+      firebase.child("users").child(authData.uid).child("networks").child(network_name);
+
+    userNetworksRef.set({
+      coins: 5,
+      is_admin: "true"
+    });
+    
+    // add the user to the network's admins and users
+    var networksRef = firebase.child("networks").child(network_name);
+    networksRef.set({
+      "admins": authData.uid,
+    });
+
+    networksRef.child("users").child(authData.uid).set("value");
+
+
+
+  }); //end authWithCustomToken
+
+
+  res.send(templates.render("user.njk"));
+}); //end add-network\
+
+app.get("/new-network", function(req,res) {
+  res.send(templates.render("new-network.njk"));
+});
+
+// creating a new account
+app.get("/create-account", function(req, res) {
+  res.send(templates.render("register.njk"));
+});
+
+/// Send user to "join network" page
+app.get("/enter-network", function(req, res) {
+  res.send(templates.render("join-network.njk"));
+});
 
 /**
  * \brief This endpoint uses post internally, so a GET request to '/' means that
