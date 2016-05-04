@@ -13,6 +13,11 @@
     <button type="submit"> Join a Network </button>
   </form>
 
+  <form action="/leave-network">
+    <input type="hidden" name="nid" value="{{ current }}"/>
+    <button type="submit"> Leave {{ current }} </button>
+  </form>
+
   <button type="button" onclick="logout()">Logout</button>
 
   {% if current.is_admin %}

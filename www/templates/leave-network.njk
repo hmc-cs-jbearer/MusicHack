@@ -1,0 +1,34 @@
+{% extends "base.njk" %}
+
+{% block title %}Confirm leave network{% endblock %}
+
+{% block body %}
+
+<form class="ui form" id="cancel" action="/">
+  <div class="field">
+    <input type="hidden" name="nid" value="{{ nid }}"/>
+    <label>Are you sure you want to leave the network {{ nid }}?</label>
+  </div>
+  <button type="button" onclick="leaveNetwork('{{ nid }}')" class="ui secondary button">
+    Yes, I'm sure.
+  </button>
+  <button type="submit" class="ui button">
+    Cancel.
+  </button>
+</form>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script type="text/javascript">
+  function leaveNetwork(nid) {
+    eraseData("/users/" + user.uid + "/networks/{{ nid }}");
+    eraseData("/networks/{{ nid }}/users/" + user.uid);
+    eraseData("/networks/{{ nid }}/admins/" + user.uid);
+
+    window.location = "/";
+  }
+</script>
+
+{% endblock %}

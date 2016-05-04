@@ -67,6 +67,13 @@ function setData(path, data, callback) {
 }
 
 /**
+ * Erase data from the given path. Equivalent to setData(path, null, callback).
+ */
+function eraseData(path, callback) {
+  setData(path, null, callback);
+}
+
+/**
  * Create a new child with a unique key at path and store data there.
  * Upon success, the callback function is called and given the new key as an
  * argument.

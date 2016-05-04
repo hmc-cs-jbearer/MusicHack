@@ -49,4 +49,8 @@ app.route("/join-network", function() {
   app.render("join-network.njk");
 });
 
+app.route("/leave-network", function(args) {
+  app.render("leave-network.njk", args);
+});
+
 app.handleRequest();
