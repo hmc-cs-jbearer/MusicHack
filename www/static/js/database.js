@@ -1,4 +1,5 @@
 const FIREBASE_ROOT = "https://musichack16.firebaseio.com";
+
 var firebase = new Firebase(FIREBASE_ROOT);
 
 function stackTrace() {

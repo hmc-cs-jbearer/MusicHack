@@ -9,12 +9,12 @@
 
   "rewrites": [
     {
-      "source": "/login*",
-      "destination": "/static/html/login.html"
+      "source": "/public/**",
+      "destination": "/static/html/public.html"
     },
     {
-      "source": "**",
-      "destination": "/static/html/index.html"
+      "source": "/**",
+      "destination": "/static/html/private.html"
     }
   ]
 }

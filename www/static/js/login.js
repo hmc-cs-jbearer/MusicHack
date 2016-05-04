@@ -26,6 +26,6 @@ firebase.onAuth(function(authData) {
     user = authData;
   } else {
     console.log("Redirecting to login");
-    window.location = "/login?continue=" + window.location;
+    window.location = "/public/login?continue=" + window.location;
   }
 });

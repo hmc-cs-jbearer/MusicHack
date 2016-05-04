@@ -3,9 +3,9 @@
  * based on the location of the browser.
  */
 class Router {
-  constructor(templates) {
+  constructor() {
       this.endpoints = {};
-      nunjucks.configure(templates);
+      nunjucks.configure("/templates");
   }
 
   /**
@@ -26,7 +26,11 @@ class Router {
    * data is a JSON object which is given to the handlers.
    */
   handle(endpoint, data) {
-    this.endpoints[endpoint].forEach((handler) => handler(data));
+    if (this.endpoints[endpoint]) {
+      this.endpoints[endpoint].forEach((handler) => handler(data));
+    } else {
+      console.log("Unhandled URL:", endpoint);
+    }
   }
 
   /**

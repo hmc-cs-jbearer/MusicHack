@@ -1,4 +1,6 @@
-{% extends "base.njk" %} {% block title %}Juke!{% endblock %}
+{% extends "base.njk" %}
+
+{% block title %}Juke!{% endblock %}
 
 {% block body %}
 
@@ -20,11 +22,11 @@
     </div>
   </form>
 
-  <a href="/create-account">
-  <button type="submit"> Create new account </button>
-  </a>
+  <form action="/public/register">
+    <button type="submit"> Create new account </button>
+  </form>
 
-  <a href="/forgot-password"> Forgot Password? </a>
+  <a href="/public/forgot-password"> Forgot Password? </a>
 </div>
 
 {% endblock %}

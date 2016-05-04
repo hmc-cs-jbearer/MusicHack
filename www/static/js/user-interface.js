@@ -63,6 +63,7 @@ function syncToNetwork(nid) {
  * removeList: the complement of addlist (ie either "downvoters" or "upvoters")
  */
 function vote(nid, addList, removeList) {
+  
   var queuePath = "/networks/" + nid + "/queue";
 
   // get the queue

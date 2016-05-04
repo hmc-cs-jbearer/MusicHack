@@ -5,12 +5,11 @@
  * everything that happens here will slow down the page load.
  */
 
-var app = new Router("templates");
+var app = new Router();
 
 // Endpoints
 
 app.route("/", function(args) {
-  
   getData("/users/" + user.uid + "/networks", function(networks) {
     if (!networks) {
       // The user is not yet subscribed to any networks
