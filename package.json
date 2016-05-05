@@ -1,25 +1,23 @@
 {
-	"name" : "juke",
-	"version" : "0.0.3",
-	"dependencies" : {
-		"serve" : "1.4.0",
-		"firebase" : "2.4.2"
-	},
-
-	"devDependencies" : {
-		"firebase-tools" : "2.2.1"
-	},
-
-	"scripts" : {
-		"start" : "firebase serve > log.txt"
-	},
-
-	"repository" : {
-	   "type" : "git",
-	   "url" : "https://github.com/hmc-cs-jbearer/MusicHack.git"
-	},
-
-	"jshintConfig" : {
-		"esversion" : 6
-	}
+  "name": "juke",
+  "version": "0.0.3",
+  "dependencies": {
+    "serve": "1.4.0",
+    "firebase": "2.4.2"
+  },
+  "devDependencies": {
+    "firebase-security-tester": "0.0.1",
+    "firebase-tools": "2.2.1",
+    "jsonminify": "^0.4.1"
+  },
+  "scripts": {
+    "start": "firebase serve > log.txt"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hmc-cs-jbearer/MusicHack.git"
+  },
+  "jshintConfig": {
+    "esversion": 6
+  }
 }
