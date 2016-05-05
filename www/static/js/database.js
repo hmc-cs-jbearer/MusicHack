@@ -15,32 +15,47 @@ function stackTrace() {
 }
 
 /**
+ * Parse a Firebase Error object and return a descriptive string
+ */
+function formatError(error) {
+
+  var message = error.code;
+
+  var details = "";
+
+  if (error.message) {
+    details += error.message + " ";
+  }
+
+  if (error.details) {
+    details += error.details;
+  }
+
+  if (details) {
+    message += "\n\nDetails: " + details;
+  }
+
+  return message
+}
+
+/**
  * Gets a JSON object from the given path relative to FIREBASE_ROOT.
  * Upon success, the callback onSuccess is passed the JSON object. Upon error,
  * an erro message is logged.
  */
 function getData(path, onSuccess) {
 
-  var reqUrl = FIREBASE_ROOT + path + ".json";
-
   // Capture the stack trace in case of error
   var trace = stackTrace();
 
-  $.getJSON(reqUrl, {
-    auth: user.token
-  }, onSuccess)
+  firebase.child(path).once("value", function(snapshot) {
+    onSuccess(snapshot.val());
+  }, function(error) {
+    var message = "Tried to get data from " + path + ", but encountered error: ";
+    message += formatError(error);
+    message += "\n\nTraceback: " + trace;
 
-  .fail(function(jqXHR, status, error) {
-    var message = "Tried to GET from " + reqUrl + "with token " + user.token + 
-      ", but encountered error:\n";
-    if (status) {
-      message += (status + ".");
-    }
-    if (error) {
-      message += error + ".";
-    }
     console.log(message);
-    console.log("Traceback:", trace);
   });
 }
 
@@ -56,9 +71,11 @@ function setData(path, data, callback) {
 
   firebase.child(path).set(data, function(error) {
     if (error) {
-      console.log("Tried to set data at " + path + " , but encountered error:");
-      console.log(error + ".");
-      console.log("Traceback:", trace);
+      var message = "Tried to set data at " + path + ", but encountered error: ";
+      message += formatError(error);
+      message += "\n\nTraceback: " + trace;
+
+      console.log(message);
     }
     else if (callback) {
       callback();
@@ -85,9 +102,11 @@ function pushData(path, data, callback) {
   var ref = firebase.child(path).push(data, function(error) {
     console.log("callback");
     if (error) {
-      console.log("Tried to push data at " + path + " , but encountered error:");
-      console.log(error + ".");
-      console.log("Traceback:", trace);
+      var message = "Tried to push data to " + path + ", but encountered error: ";
+      message += formatError(error);
+      message += "\n\nTraceback: " + trace;
+
+      console.log(message);
     }
     else if (callback) {
       callback(ref.key());
