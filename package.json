@@ -1,17 +1,19 @@
 {
   "name": "juke",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "dependencies": {
     "serve": "1.4.0",
     "firebase": "2.4.2"
   },
   "devDependencies": {
-    "firebase-security-tester": "0.0.1",
     "firebase-tools": "2.2.1",
-    "jsonminify": "^0.4.1"
+    "jsonminify": "^0.4.1",
+    "targaryen": "^2.1.0"
   },
   "scripts": {
-    "start": "firebase serve > log.txt"
+    "start": "firebase serve > log.txt",
+    "pretest": "node util/minify.js firebase-rules.json test/security-tests.json",
+    "test": "targaryen firebase-rules-min.json test/security-tests-min.json"
   },
   "repository": {
     "type": "git",

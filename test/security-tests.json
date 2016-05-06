@@ -1,0 +1,173 @@
+{
+  "root": {
+
+    "networks": {
+
+      "testNet": {
+
+        "users": {
+          "admin": 1,
+          "user": 1
+        },
+
+        "admins": {
+          "admin": 1
+        },
+
+        "queue": {
+          "front": "adminSong",
+          "back": "userSong",
+
+          "adminSong": {
+
+            "data": {
+              "album_name": "Crash",
+              "artist_name": "Dave Matthews Band",
+              "image_url": "www.foobar.com/foo",
+              "name": "Two Step"
+            },
+
+            "requester": "admin",
+
+            "coinsBeforeSong": 5,
+
+            "upvoters": "user",
+
+            "next": "userSong"
+          },
+
+          "userSong": {
+
+            "data": {
+              "album_name": "The Head and the Heart",
+              "artist_name": "The Head and the Heart",
+              "image_url": "www.barfoo.com/bar",
+              "name": "Down in the Valley"
+            },
+
+            "requester": "user",
+
+            "coinsBeforeSong": 5
+          }
+        }
+      }
+    },
+
+    "users": {
+
+      "admin": {
+        "name": "Joe Admin",
+        "username": "jadmin@hmc.edu",
+        "networks": {
+          "testNet": {
+            "coins": 5,
+            "is_admin": "true"
+          }
+        }
+      },
+
+      "user": {
+        "name": "Bob User",
+        "username": "buser@hmc.edu",
+        "networks": {
+          "testNet": {
+            "coins": 5
+          }
+        }
+      }
+    }
+  },
+
+  "users": {
+    "user": {"uid": "user"},
+    "admin": {"uid": "admin"},
+    "anon": {}
+  },
+
+  "tests": {
+
+    // USER TESTS
+
+    // Users can read their own data and noone elses
+    "users/admin": {
+      "canRead": ["admin"],
+      "cannotRead": ["user", "anon"]
+    },
+    "users/user": {
+      "canRead": ["user"],
+      "cannotRead": ["admin", "anon"]
+    },
+
+    // Users can change their own name as long as it remains a string
+    "users/user/name": {
+      "canWrite": [{"auth": "user", "data": "Any String"}],
+      "cannotWrite": [
+        {"auth": "user", "data": 5},
+        {"auth": "admin", "data": "Someone elses name"},
+        {"auth": "anon", "data": "Not even a user"}
+      ]
+    },
+
+    /// \todo canWrite tests for username: must enforce uniqueness,
+    /// or disallow all writes and let the server do it
+
+    // Users cannot change their coin count; only a trusted server can
+    "users/user/networks/testNet/coins": {
+      "cannotWrite": [
+        {"auth": "user", "data": 10},
+        {"auth": "user", "data": "10"},
+        {"auth": "admin", "data": 10},
+        {"auth": "admin", "data": "10"},
+        {"auth": "anon", "data": 10},
+        {"auth": "anon", "data": "10"}
+      ]
+    },
+
+    // Users can add themselves to a network iff they start out with 5 coins
+    "users/user/networks/newNet": {
+      "canWrite": [
+        {"auth": "user", "data": {
+          "coins": 5
+        }}
+      ],
+      "cannotWrite": [
+        {"auth": "user", "data": {
+          "coins": 10
+        }},
+        {"auth": "user", "data": {}},
+        {"auth": "admin", "data": {
+          "coins": 5
+        }},
+        {"auth": "anon", "data": {
+          "coins": 5
+        }}
+      ]
+    },
+
+    // Users can remove themselves but no one elsefrom networks
+    "users/user/networks/testNet": {
+      "canWrite": [{"auth": "user", "data": null}]
+    },
+    "users/admin/networks/testNet": {
+      "cannotWrite": [{"auth": "user", "data": null}]
+    },
+
+    // /// \todo Can admins remove users from networks?
+    // /// \todo Can users add themselves to newtorks?
+    // // ^ Depend on design decision resolving issues #7, #8
+
+    // // NETWORK TESTS
+
+    // // A user can read the data in their own network
+    "networks/testNet": {
+      "canRead": ["user", "admin"],
+      "cannotRead": ["anon"]
+    }
+
+    /// \todo Test .write rules for network/users and network/admins. 
+    /// Correct behavior will depend on resolution to issues #7, #8
+
+    
+
+  }
+}

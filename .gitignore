@@ -1,3 +1,4 @@
 node_modules/*
 **env.txt
 **log.txt
+**/*-min.json

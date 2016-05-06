@@ -3,7 +3,7 @@
 
   "public": "www",
 
-  "rules": "firebase-rules.json",
+  "rules": "firebase-rules-min.json",
   
   "redirects": [],
 
