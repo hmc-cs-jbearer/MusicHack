@@ -4,7 +4,7 @@
     "networks": {
       
       // Only logged in users can see networks
-      ".read" : "auth.uid != null && auth.uid != undefined",
+      ".read" : "auth != null",
       
       // The networks key itself is static, only specific netwoks can be written if the user has the right permissions
       //".write" : false,
@@ -28,7 +28,7 @@
         "users" : {
           "$user" : {
             // A user can edit their own data, or an admin can add or remove a user
-            ".write" : "$user == auth.uid || !data.exists() || !newData.exists()"
+            ".write" : "$user == auth.uid || root.child('networks').child($network).child('admins').hasChild(auth.uid)"
           }
         },
         

@@ -111,7 +111,7 @@ function addListeners() {
 function listen() {
 
   // Read the Firebase secret from a file
-  var secret = fs.readFileSync('env.txt', 'utf8');
+  var secret = fs.readFileSync('../secret.txt', 'utf8');
 
   // Authenticate as admin for root privileges
   firebase.authWithCustomToken(secret, function(error) {

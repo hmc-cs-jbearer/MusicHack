@@ -80,8 +80,7 @@
 
   "users": {
     "user": {"uid": "user"},
-    "admin": {"uid": "admin"},
-    "anon": {}
+    "admin": {"uid": "admin"}
   },
 
   "tests": {
@@ -152,19 +151,35 @@
       "cannotWrite": [{"auth": "user", "data": null}]
     },
 
-    // /// \todo Can admins remove users from networks?
-    // /// \todo Can users add themselves to newtorks?
-    // // ^ Depend on design decision resolving issues #7, #8
+    /// \todo Can users add themselves to newtorks?
+    // ^ Depend on design decision resolving issues #7, #8
 
-    // // NETWORK TESTS
+    // NETWORK TESTS
 
-    // // A user can read the data in their own network
+    // A user can read the data in their own network
     "networks/testNet": {
       "canRead": ["user", "admin"],
       "cannotRead": ["anon"]
+    },
+
+    // A user can remove themselves from a network, and admins can kick users
+    // out of their networks
+    "networks/testNet/users/user": {
+      "canWrite": [
+        {"auth": "user", "data": null},
+        {"auth": "admin", "data": null}
+      ]
+    },
+    "networks/testNet/users/admin": {
+      "canWrite": [
+        {"auth": "admin", "data": null}
+      ],
+      "cannotWrite": [
+        {"auth": "user", "data": null}
+      ]
     }
 
-    /// \todo Test .write rules for network/users and network/admins. 
+    /// \todo Test .write rules for network/admins. 
     /// Correct behavior will depend on resolution to issues #7, #8
 
     

@@ -11,6 +11,7 @@
     "targaryen": "^2.1.0"
   },
   "scripts": {
+    "prestart": "node util/minify.js firebase-rules.json; node util/upload-rules.js",
     "start": "firebase serve > log.txt",
     "pretest": "node util/minify.js firebase-rules.json test/security-tests.json",
     "test": "targaryen firebase-rules-min.json test/security-tests-min.json"

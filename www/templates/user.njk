@@ -66,12 +66,14 @@
             <span id="current_artist_name"></span> 
             <br>
             <span id="current_album_name"></span>
-            <button onclick="upvote('{{ current }}')" class="ui icon button">
-              <i class="right floated thumbs up icon"></i>
-            </button>
-            <button onclick="downvote('{{ current }}')" class="ui icon button">
-              <i class="left floated thumbs down icon"></i>
-            </button>
+            <div class="ui buttons">
+              <button onclick="upvote('{{ current }}')" class="ui icon button">
+                <i class="right floated thumbs up icon"></i>
+              </button>
+              <button onclick="downvote('{{ current }}')" class="ui icon button">
+                <i class="left floated thumbs down icon"></i>
+              </button>
+            </div>
           </div>
         </div>
       </div>

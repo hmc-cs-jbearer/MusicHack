@@ -11,7 +11,7 @@ if "%~1"=="-FIXED_CTRL_C" (
 )
 
 cd backend
-start node firebase-client.js > log.txt
+start node firebase-client.js > firebae-client.log
 
 cd ..
 npm start
