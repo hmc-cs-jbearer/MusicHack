@@ -1,3 +1,8 @@
+/*
+  Upload the rules defined in firebase-rules-min.json to Firebase. Run
+  node minify.js firebase-rules.json first.
+*/
+
 var https = require("https");
 var data = require("../firebase-rules-min.json");
 var fs = require("fs");

@@ -6,24 +6,13 @@
       // Only logged in users can see networks
       ".read" : "auth != null",
       
-      // The networks key itself is static, only specific netwoks can be written if the user has the right permissions
-      //".write" : false,
-      
       "$network" : {
-        
-        // A user must be a member of a network to read
-        ".read" : "data.child('users').hasChild(auth.uid)",
-        
-        // A user must be an admin of a network to write, except where explicity overridden
-        // EDIT: for now, new users can add themselves without admin's approval.  We should change this feature.
-        //".write" : "!data.hasChild('admins') ||
-        //  (data.child('admins').hasChild(auth.uid))",
-                    
           
-        // Network doesn't exist, and input has admins, or network does exist and input has users 
         ".validate" : 
-          "(!data.exists() && newData.hasChild('admins')) ||
-          (data.exists() && newData.hasChild('users'))",
+          // New network can be created with creator as admin
+          "(!data.exists() && newData.hasChild('admins') && newData.hasChild('users')
+            && newData.child('admins').hasChild(auth.uid) && newData.child('users').hasChild(auth.uid)) ||
+          (data.exists() && newData.hasChild('users') && newData.hasChild('admins'))",
           
         "users" : {
           "$user" : {
@@ -40,34 +29,65 @@
         },
         
         "queue" : {
-          // Any user can edit the queue
-          ".write" : "data.parent().child('users').hasChild(auth.uid)",
           
           "front" : {
+
+            // Admins change front when the song changes
+            ".write": "data.parent().parent().child('admins').hasChild(auth.uid)",
+
             // Front must point to a song in the queue 
             ".validate" : "newData.parent().hasChild(newData.val())"
           },
           
           "back" : {
+
+            // Any user can change back by adding a song to the queue
+            ".write": "data.parent().parent().child('users').hasChild(auth.uid)",
+
             // Back must point to a song in the queue, and the back song can have no next song
             ".validate" : "newData.parent().hasChild(newData.val()) && !newData.parent().child(newData.val()).hasChild('next')"
           },
           
-          "$song_id" : {
+          "$song" : {
+
+            // New songs can be added to the back of the queue
+            ".write": "root.child('networks').child($network).child('users').hasChild(auth.uid) && !data.exists() &&
+              !newData.hasChild('next') && newData.parent().child('back').val() == $song",
+
             ".validate" : "newData.hasChild('data') && newData.hasChild('requester')",
             
             "data" : {
               ".validate" : "newData.hasChild('name') && newData.hasChild('artist_name') && newData.hasChild('album_name') && newData.hasChild('image_url')"
             },
             
-            "requester" : {
-              // The requester of the song must be the ID of a user in the network
-              ".validate" : "root.child('networks/$network/users').hasChild(newData.val())"
-            },
-            
             "next" : {
-              // Net must point to a song in the queue
+              // Next must point to a song in the queue
               ".validate": "newData.parent().parent().hasChild(newData.val())"
+            },
+
+            "upvoters": {
+
+              "$upvoter": {
+                // Any user can add themselves as an upvoter to the front song...
+                ".write": "newData.parent().parent().parent().child('front').val() == $song &&
+                  root.child('networks').child($network).child('users').hasChild(auth.uid) &&
+                  $upvoter == auth.uid",
+
+                // As long as they are not currently a downvoter
+                ".validate": "!newData.parent().parent().child('downvoters').hasChild($upvoter)"
+              }
+            },
+
+            "downvoters": {
+              "$downvoter": {
+                // Any user can add themselves as a downvoter to the front song...
+                ".write": "newData.parent().parent().parent().child('front').val() == $song &&
+                  root.child('networks').child($network).child('users').hasChild(auth.uid) &&
+                  $downvoter == auth.uid",
+
+                // As long as they are not currently an upvoter
+                ".validate": "!newData.parent().parent().child('upvoters').hasChild($downvoter)"
+              }
             }
             
           }

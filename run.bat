@@ -10,8 +10,6 @@ if "%~1"=="-FIXED_CTRL_C" (
    GOTO :EOF
 )
 
-cd backend
-start node firebase-client.js > firebae-client.log
-
-cd ..
+if not exist log\NUL mkdir log
+start node backend/firebase-client.js > log/firebae-client.log
 npm start

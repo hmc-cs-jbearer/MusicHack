@@ -67,29 +67,18 @@ function vote(nid, addList, removeList) {
   var queuePath = "/networks/" + nid + "/queue";
 
   // get the queue
-  getData(queuePath, function(queue) {
-    if (!queue) {
+  getData([queuePath, "front"].join("/"), function(songId) {
+    if (!songId) {
       // No song playing right now
       return;
     }   
 
-    var songId = queue.front;
-    var song = queue[songId];
+    // Just in case the user has already voted and is changing their vote,
+    // remove them from the other list
+    setData([queuePath, songId, removeList, user.uid].join("/"), null);
 
-    if (!song[addList]) {
-      // Create a list of people who have voted this way
-      song[addList] = {};
-    }
-    // Add the user to the list
-    song[addList][user.uid] = 1;
-
-    if (song[removeList]) {
-      // Just in case the user has already voted and is changing their vote,
-      // remove them from the other list
-      song[removeList][user.uid] = null;
-    }
-
-    setData(queuePath + "/" + songId, song);
+    // Add the user's vote
+    setData([queuePath, songId, addList, user.uid].join("/"), 1);
   });
 }
 

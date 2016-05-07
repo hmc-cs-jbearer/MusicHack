@@ -1,6 +1,4 @@
 node_modules/*
 **secret.txt
-**env.txt
-**log.txt
 **/*-min.json
-**/*.log
+log/*

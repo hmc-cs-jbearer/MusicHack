@@ -1,7 +1,5 @@
 #!/bin/sh
 
-cd backend
-node firebase-client.js > firebase-client.log &
-
-cd ..
+mkdir -p log
+node backend/firebase-client.js > log/firebase-client.log &
 npm start

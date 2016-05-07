@@ -7,7 +7,9 @@
 
         "users": {
           "admin": 1,
-          "user": 1
+          "user": 1,
+          "upvoter": 1,
+          "downvoter": 1
         },
 
         "admins": {
@@ -15,10 +17,10 @@
         },
 
         "queue": {
-          "front": "adminSong",
-          "back": "userSong",
+          "front": "frontSong",
+          "back": "backSong",
 
-          "adminSong": {
+          "frontSong": {
 
             "data": {
               "album_name": "Crash",
@@ -31,12 +33,18 @@
 
             "coinsBeforeSong": 5,
 
-            "upvoters": "user",
+            "upvoters": {
+              "upvoter": 1
+            },
 
-            "next": "userSong"
+            "downvoters": {
+              "downvoter": 1
+            },
+
+            "next": "backSong"
           },
 
-          "userSong": {
+          "backSong": {
 
             "data": {
               "album_name": "The Head and the Heart",
@@ -74,13 +82,36 @@
             "coins": 5
           }
         }
+      },
+
+      "upvoter": {
+        "name": "Song Lover",
+        "username": "uvoter@hmc.edu",
+        "networks": {
+          "testNet": {
+            "coins": 5
+          }
+        }
+      },
+
+      "downvoter": {
+        "name": "Song Hater",
+        "username": "dvoter@hmc.edu",
+        "networks": {
+          "testNet": {
+            "coins": 5
+          }
+        }
       }
     }
   },
 
   "users": {
     "user": {"uid": "user"},
-    "admin": {"uid": "admin"}
+    "admin": {"uid": "admin"},
+    "upvoter": {"uid": "upvoter"},
+    "downvoter": {"uid": "downvoter"},
+    "anon": null
   },
 
   "tests": {
@@ -177,12 +208,89 @@
       "cannotWrite": [
         {"auth": "user", "data": null}
       ]
-    }
+    },
 
     /// \todo Test .write rules for network/admins. 
     /// Correct behavior will depend on resolution to issues #7, #8
 
-    
+    // A user can add or remove themselves but no one else to the upvote/downvote
+    // list of the currently playing song only
+    "networks/testNet/queue/frontSong/upvoters/user": {
+      "canWrite": [
+        {"auth": "user", "data": 1},
+        {"auth": "user", "data": null}
+      ],
+      "cannotWrite": [
+        {"auth": "admin", "data": 1},
+        {"auth": "admin", "data": null},
+        {"auth": "anon", "data": 1},
+        {"auth": "anon", "data": null}
+      ]
+    },
+    "networks/testNet/queue/frontSong/upvoters/admin": {
+      "canWrite": [
+        {"auth": "admin", "data": 1},
+        {"auth": "admin", "data": null}
+      ],
+      "cannotWrite": [
+        {"auth": "user", "data": 1},
+        {"auth": "user", "data": null},
+        {"auth": "anon", "data": 1},
+        {"auth": "anon", "data": null}
+      ]
+    },
+    "networks/testNet/queue/backSong/upvoters/user": {
+      "cannotWrite": [
+        {"auth": "user", "data": 1}
+      ]
+    },
+    "networks/testNet/queue/backSong/upvoters/admin": {
+      "cannotWrite": [
+        {"auth": "admin", "data": 1}
+      ]
+    },
+    "networks/testNet/queue/frontSong/downvoters/user": {
+      "canWrite": [
+        {"auth": "user", "data": 1},
+        {"auth": "user", "data": null}
+      ],
+      "cannotWrite": [
+        {"auth": "admin", "data": 1},
+        {"auth": "admin", "data": null},
+        {"auth": "anon", "data": 1},
+        {"auth": "anon", "data": null}
+      ]
+    },
+    "networks/testNet/queue/frontSong/downvoters/admin": {
+      "canWrite": [
+        {"auth": "admin", "data": 1},
+        {"auth": "admin", "data": null}
+      ],
+      "cannotWrite": [
+        {"auth": "user", "data": 1},
+        {"auth": "user", "data": null},
+        {"auth": "anon", "data": 1},
+        {"auth": "anon", "data": null}
+      ]
+    },
+    "networks/testNet/queue/backSong/downvoters/user": {
+      "cannotWrite": [
+        {"auth": "user", "data": 1}
+      ]
+    },
+    "networks/testNet/queue/backSong/downvoters/admin": {
+      "cannotWrite": [
+        {"auth": "admin", "data": 1}
+      ]
+    },
+
+    // A user cannot be in the upvote and downvote list at the same time
+    "networks/testNet/queue/frontSong/upvoters/downvoter": {
+      "cannotWrite": [{"auth": "downvoter", "data": 1}]
+    },
+    "networks/testNet/queue/frontSong/downvoters/upvoter": {
+      "cannotWrite": [{"auth": "upvoter", "data": 1}]
+    }
 
   }
 }
