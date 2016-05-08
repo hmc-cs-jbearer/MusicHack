@@ -17,8 +17,9 @@ function addNetwork() {
 
       // Add the creator of the network as an admin and a user
       network.admins[user.uid] = 1;
-      setData("/networks/" + name, network);
-      joinNetwork();
+      setData("/networks/" + name, network, function(){
+        joinNetwork();
+      });
     }
   });
 }
@@ -28,6 +29,7 @@ function joinNetwork() {
   var name = document.getElementById("networkName").value;
 
   getData("/networks/" + name, function(network) {
+    console.log(user.uid);
     if (!network) {
       // The network does not exist
       document.getElementById("error").innerHTML = 
@@ -39,18 +41,12 @@ function joinNetwork() {
         "You are already a member of '" + name + "'.";
     } else {
 
-      if (!network.users) {
-        network.users = {};
-      }
-
-      // Add the user to the list of network members
-      network.users[user.uid] = 1;
-
       // Add the new network to the user's networks
-      setData("/users/" + user.uid + "/networks/" + name, {
+      setData(["users", user.uid, "networks", name].join("/"), {
         coins: DEFAULT_COIN_COUNT
       }, function() {
-        setData("/networks/" + name, network, function() {
+        // Add the user to the network's users
+        setData(["networks", name, "users", user.uid].join("/"), 1, function() {
           // Redirect to the homepage for the new network
           window.location = "/?nid=" + name;
         });

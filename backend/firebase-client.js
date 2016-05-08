@@ -64,7 +64,18 @@ function nextSong(queue, songId) {
     // already been playing, and the server has just started. In that case we
     // keep the old value.
     song.child("coinsBeforeSong").once("value", function(coinsBeforeSong) {
-      if (coinsBeforeSong) {
+      if (coinsBeforeSong.exists()) {
+
+        console.log("Song playing. Coins:", coinsBeforeSong.val());
+
+        // Listen for changes in the upvote/downvote list for the new song
+        song.on("value", function(song) {
+          vote(song, network);
+        });
+      } else {
+
+        console.log("Getting coins before new song.");
+        
         // Get the user's coin count
         network.child("coins").once("value", function(coins) {
           song.child("coinsBeforeSong").set(coins.val());
@@ -73,12 +84,6 @@ function nextSong(queue, songId) {
           song.on("value", function(song) {
             vote(song, network);   
           });
-
-        });
-      } else {
-        // Listen for changes in the upvote/downvote list for the new song
-        song.on("value", function(song) {
-          vote(song, network);
         });
       }
     });

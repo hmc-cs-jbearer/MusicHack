@@ -12,22 +12,17 @@
   </div>
   <div class="field">
     <label>Username</label>
-    <input placeholder="Username" id="username" type="text"/>
+    <input placeholder="Email" id="email" type="text"/>
   </div>
   <div class="field">
     <label>Password</label>
     <input placeholder="Password" type="password" id="password"/>
   </div>
   <div class="field">
-    <label>Re-type password</label>
-    <input placeholder="Reenter your password" type="password" id="retype-password">
+    <input placeholder="Reenter your password" type="password" id="checkPassword">
   </div>
-  <input type="hidden" name="token" id="tokenOnSuccess"/>
   <div class="inline field">
-    <div>
-      <button onclick="check()" type="button"> Create account </button>
-      <a href="/"><button type="button">Back</button></a>
-    </div>
+    <button onclick="register()" type="button"> Create account </button>
   </div>
 </div>
 
@@ -36,57 +31,6 @@
 {% block scripts %}
 {{ super() }} 
 
-
-<script language="javascript">
-  function check() { //create new acct in firebase
-    var ref = new Firebase("https://musichack16.firebaseio.com");
-
-    console.log("checking info");
-
-    var password = document.getElementById("password").value;
-    var check_password = document.getElementById("retype-password").value;
-
-    if (password !== check_password) {
-      document.getElementById("error").innerHTML=
-        "Make sure you type your password correctly both times!";
-        return;
-    }
-
-    ref.createUser({
-      email    : document.getElementById("username").value,
-      password : document.getElementById("password").value
-    }, function(error, userData) {
-      if (error) {
-        switch (error.code) {
-        case "EMAIL_TAKEN":
-          document.getElementById("error").innerHTML =
-            "Sorry. An account already exists with that email.";
-          break;
-        case "INVALID_EMAIL":
-          document.getElementById("error").innerHTML = 
-            "Please enter a valid email address.";
-          break;
-        default:
-          console.log("Error creating user:", error);
-          document.getElementById("error").innerHTML =
-            "Uh oh. Looks like there was an error.";
-        }
-      } else {   
-        console.log("Successfully registered user.");
-
-        var users = ref.child("users");
-        var thisUser = users.child(userData.uid);
-
-        thisUser.set({
-          name: document.getElementById("name").value,
-          username: document.getElementById("username").value
-        }); //end set
-
-        window.location = "/";
-
-      } //end else
-    });
-  }
-</script>
+<script type="text/javascript" src="/static/js/account.js"></script>
 
 {% endblock %}

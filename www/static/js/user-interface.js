@@ -66,7 +66,7 @@ function vote(nid, addList, removeList) {
   
   var queuePath = "/networks/" + nid + "/queue";
 
-  // get the queue
+  // get the song to upvote
   getData([queuePath, "front"].join("/"), function(songId) {
     if (!songId) {
       // No song playing right now

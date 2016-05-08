@@ -7,12 +7,9 @@
       ".read" : "auth != null",
       
       "$network" : {
-          
-        ".validate" : 
-          // New network can be created with creator as admin
-          "(!data.exists() && newData.hasChild('admins') && newData.hasChild('users')
-            && newData.child('admins').hasChild(auth.uid) && newData.child('users').hasChild(auth.uid)) ||
-          (data.exists() && newData.hasChild('users') && newData.hasChild('admins'))",
+
+        // A user can add a new network
+        ".write": "!data.exists()",
           
         "users" : {
           "$user" : {
@@ -106,7 +103,7 @@
         ".write" : "auth.uid == $user && (!data.exists() || !newData.exists())",
 
         // A new user can add themselves
-        ".validate" : "!newData.exists() || newData.hasChildren(['networks', 'name', 'username'])",
+        ".validate" : "!newData.exists() || newData.hasChildren(['name', 'email'])",
 
         "name": {
           // A user can always edit their name
@@ -115,10 +112,12 @@
           ".validate": "newData.isString()"
         },
 
-        "username": {
+        "email": {
           /// \todo Allow writes but ensure uniqueness. For now, disallow
-          /// changes to the username
-          ".write": "false"
+          /// changes to the email
+          ".write": "false",
+
+          ".validate": "newData.isString()"
         },
           
         "networks" : {

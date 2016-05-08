@@ -10,15 +10,15 @@
   <p>Welcome to Juke!</p>
   <form>
     <div class="field">
-      <label>Username</label>
-      <input placeholder="Username" id="username" type="text">
+      <label>Email</label>
+      <input placeholder="Email" id="email" type="text">
     </div>
     <div class="field">
       <label>Password</label>
       <input placeholder="Password" type="password" id="password">
     </div>
     <div class="inline field">
-      <button onclick="check()" type="button">Sign in</button>
+      <button onclick="login('{{ continue }}')" type="button">Sign in</button>
     </div>
   </form>
 
@@ -26,7 +26,9 @@
     <button type="submit"> Create new account </button>
   </form>
 
-  <a href="/public/forgot-password"> Forgot Password? </a>
+  <form action="/public/reset-password">
+    <button type="submit"> Forgot Password? </button>
+  </form>
 </div>
 
 {% endblock %}
@@ -34,22 +36,6 @@
 {% block scripts %}
 {{ super() }}
 
-<script language="javascript">
-  function check() { //create new acct in firebase
-    var ref = new Firebase("https://musichack16.firebaseio.com");
-    ref.authWithPassword({
-      email    : document.getElementById("username").value,
-      password : document.getElementById("password").value
-    }, function(error, userData) {
-      if (error) {
-        document.getElementById("error").innerHTML = 'Invalid username or password.';
-        console.log("Error creating user:", error);
-      } else {
-        console.log("Successfully authenticated user account with token:", userData.token);
-        window.location = "{{ continue }}";
-      }
-    });
-  }
-</script>
+<script type="text/javascript" src="/static/js/account.js"></script>
 
 {% endblock %}

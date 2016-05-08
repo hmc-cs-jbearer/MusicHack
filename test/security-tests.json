@@ -65,7 +65,7 @@
 
       "admin": {
         "name": "Joe Admin",
-        "username": "jadmin@hmc.edu",
+        "email": "jadmin@hmc.edu",
         "networks": {
           "testNet": {
             "coins": 5,
@@ -76,7 +76,7 @@
 
       "user": {
         "name": "Bob User",
-        "username": "buser@hmc.edu",
+        "email": "buser@hmc.edu",
         "networks": {
           "testNet": {
             "coins": 5
@@ -86,7 +86,7 @@
 
       "upvoter": {
         "name": "Song Lover",
-        "username": "uvoter@hmc.edu",
+        "email": "uvoter@hmc.edu",
         "networks": {
           "testNet": {
             "coins": 5
@@ -96,7 +96,7 @@
 
       "downvoter": {
         "name": "Song Hater",
-        "username": "dvoter@hmc.edu",
+        "email": "dvoter@hmc.edu",
         "networks": {
           "testNet": {
             "coins": 5
@@ -111,6 +111,7 @@
     "admin": {"uid": "admin"},
     "upvoter": {"uid": "upvoter"},
     "downvoter": {"uid": "downvoter"},
+    "newUser": {"uid": "newUser"},
     "anon": null
   },
 
@@ -128,6 +129,29 @@
       "cannotRead": ["admin", "anon"]
     },
 
+    // A new user can add themselves to the database, as long as they have a
+    // name and an email address
+    "users/newUser": {
+      "canWrite": [
+        {"auth": "newUser", "data": {
+          "name": "Newbie",
+          "email": "newbie@hmc.edu"
+        }}
+      ],
+      "cannotWrite": [
+        {"auth": "newUser", "data": {"name": "Newbie"}},
+        {"auth": "newUser", "data": {"email": "newbie@hmc.edu"}},
+        {"auth": "user", "data": {
+          "name": "Newbie",
+          "email": "newbie@hmc.edu"
+        }},
+        {"auth": "admin", "data": {
+          "name": "Newbie",
+          "email": "newbie@hmc.edu"
+        }}
+      ]
+    },
+
     // Users can change their own name as long as it remains a string
     "users/user/name": {
       "canWrite": [{"auth": "user", "data": "Any String"}],
@@ -138,7 +162,7 @@
       ]
     },
 
-    /// \todo canWrite tests for username: must enforce uniqueness,
+    /// \todo canWrite tests for email: must enforce uniqueness,
     /// or disallow all writes and let the server do it
 
     // Users cannot change their coin count; only a trusted server can
