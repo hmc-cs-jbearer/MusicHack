@@ -1,4 +1,4 @@
 node_modules/*
 **secret.txt
 **/*-min.json
-log/*
+**/*.log

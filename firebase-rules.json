@@ -2,91 +2,94 @@
   "rules": {
       
     "networks": {
+
+      "open": {
       
-      // Only logged in users can see networks
-      ".read" : "auth != null",
-      
-      "$network" : {
-
-        // A user can add a new network
-        ".write": "!data.exists()",
-          
-        "users" : {
-          "$user" : {
-            // A user can edit their own data, or an admin can add or remove a user
-            ".write" : "$user == auth.uid || root.child('networks').child($network).child('admins').hasChild(auth.uid)"
-          }
-        },
+        // Only logged in users can see networks
+        ".read" : "auth != null",
         
-        "admins" : {
-          "$admin" : {
-             // An admin can edit their own data and add a new admin
-            ".write" : "$admin == auth.uid || (!data.exists())"
-          }
-        },
-        
-        "queue" : {
-          
-          "front" : {
+        "$network" : {
 
-            // Admins change front when the song changes
-            ".write": "data.parent().parent().child('admins').hasChild(auth.uid)",
-
-            // Front must point to a song in the queue 
-            ".validate" : "newData.parent().hasChild(newData.val())"
-          },
-          
-          "back" : {
-
-            // Any user can change back by adding a song to the queue
-            ".write": "data.parent().parent().child('users').hasChild(auth.uid)",
-
-            // Back must point to a song in the queue, and the back song can have no next song
-            ".validate" : "newData.parent().hasChild(newData.val()) && !newData.parent().child(newData.val()).hasChild('next')"
-          },
-          
-          "$song" : {
-
-            // New songs can be added to the back of the queue
-            ".write": "root.child('networks').child($network).child('users').hasChild(auth.uid) && !data.exists() &&
-              !newData.hasChild('next') && newData.parent().child('back').val() == $song",
-
-            ".validate" : "newData.hasChild('data') && newData.hasChild('requester')",
+          // A user can add a new network
+          ".write": "!data.exists()",
             
-            "data" : {
-              ".validate" : "newData.hasChild('name') && newData.hasChild('artist_name') && newData.hasChild('album_name') && newData.hasChild('image_url')"
-            },
-            
-            "next" : {
-              // Next must point to a song in the queue
-              ".validate": "newData.parent().parent().hasChild(newData.val())"
-            },
-
-            "upvoters": {
-
-              "$upvoter": {
-                // Any user can add themselves as an upvoter to the front song...
-                ".write": "newData.parent().parent().parent().child('front').val() == $song &&
-                  root.child('networks').child($network).child('users').hasChild(auth.uid) &&
-                  $upvoter == auth.uid",
-
-                // As long as they are not currently a downvoter
-                ".validate": "!newData.parent().parent().child('downvoters').hasChild($upvoter)"
-              }
-            },
-
-            "downvoters": {
-              "$downvoter": {
-                // Any user can add themselves as a downvoter to the front song...
-                ".write": "newData.parent().parent().parent().child('front').val() == $song &&
-                  root.child('networks').child($network).child('users').hasChild(auth.uid) &&
-                  $downvoter == auth.uid",
-
-                // As long as they are not currently an upvoter
-                ".validate": "!newData.parent().parent().child('upvoters').hasChild($downvoter)"
-              }
+          "users" : {
+            "$user" : {
+              // A user can edit their own data, or an admin can add or remove a user
+              ".write" : "$user == auth.uid || root.child('networks').child($network).child('admins').hasChild(auth.uid)"
             }
+          },
+          
+          "admins" : {
+            "$admin" : {
+               // An admin can edit their own data and add a new admin
+              ".write" : "$admin == auth.uid || (!data.exists())"
+            }
+          },
+          
+          "queue" : {
             
+            "front" : {
+
+              // Admins change front when the song changes
+              ".write": "data.parent().parent().child('admins').hasChild(auth.uid)",
+
+              // Front must point to a song in the queue 
+              ".validate" : "newData.parent().hasChild(newData.val())"
+            },
+            
+            "back" : {
+
+              // Any user can change back by adding a song to the queue
+              ".write": "data.parent().parent().child('users').hasChild(auth.uid)",
+
+              // Back must point to a song in the queue, and the back song can have no next song
+              ".validate" : "newData.parent().hasChild(newData.val()) && !newData.parent().child(newData.val()).hasChild('next')"
+            },
+            
+            "$song" : {
+
+              // New songs can be added to the back of the queue
+              ".write": "root.child('networks').child($network).child('users').hasChild(auth.uid) && !data.exists() &&
+                !newData.hasChild('next') && newData.parent().child('back').val() == $song",
+
+              ".validate" : "newData.hasChild('data') && newData.hasChild('requester')",
+              
+              "data" : {
+                ".validate" : "newData.hasChild('name') && newData.hasChild('artist_name') && newData.hasChild('album_name') && newData.hasChild('image_url')"
+              },
+              
+              "next" : {
+                // Next must point to a song in the queue
+                ".validate": "newData.parent().parent().hasChild(newData.val())"
+              },
+
+              "upvoters": {
+
+                "$upvoter": {
+                  // Any user can add themselves as an upvoter to the front song...
+                  ".write": "newData.parent().parent().parent().child('front').val() == $song &&
+                    root.child('networks').child($network).child('users').hasChild(auth.uid) &&
+                    $upvoter == auth.uid",
+
+                  // As long as they are not currently a downvoter
+                  ".validate": "!newData.parent().parent().child('downvoters').hasChild($upvoter)"
+                }
+              },
+
+              "downvoters": {
+                "$downvoter": {
+                  // Any user can add themselves as a downvoter to the front song...
+                  ".write": "newData.parent().parent().parent().child('front').val() == $song &&
+                    root.child('networks').child($network).child('users').hasChild(auth.uid) &&
+                    $downvoter == auth.uid",
+
+                  // As long as they are not currently an upvoter
+                  ".validate": "!newData.parent().parent().child('upvoters').hasChild($downvoter)"
+                }
+              }
+              
+            }
           }
         }
       }
@@ -128,7 +131,8 @@
 
             // Users get 5 coins upon joining a new network
             ".validate": "!newData.exists() || 
-              (newData.hasChild('coins') && newData.child('coins').val() == 5)"
+              (newData.hasChildren(['coins', 'security']) && newData.child('coins').val() == 5) &&
+                newData.child('security').val() == 'open'"
           }
         }
        

@@ -3,61 +3,80 @@
 
     "networks": {
 
-      "testNet": {
+      "open": {
 
-        "users": {
-          "admin": 1,
-          "user": 1,
-          "upvoter": 1,
-          "downvoter": 1
-        },
+        "testNet": {
 
-        "admins": {
-          "admin": 1
-        },
-
-        "queue": {
-          "front": "frontSong",
-          "back": "backSong",
-
-          "frontSong": {
-
-            "data": {
-              "album_name": "Crash",
-              "artist_name": "Dave Matthews Band",
-              "image_url": "www.foobar.com/foo",
-              "name": "Two Step"
-            },
-
-            "requester": "admin",
-
-            "coinsBeforeSong": 5,
-
-            "upvoters": {
-              "upvoter": 1
-            },
-
-            "downvoters": {
-              "downvoter": 1
-            },
-
-            "next": "backSong"
+          "users": {
+            "admin": 1,
+            "user": 1,
+            "upvoter": 1,
+            "downvoter": 1
           },
 
-          "backSong": {
+          "admins": {
+            "admin": 1
+          },
 
-            "data": {
-              "album_name": "The Head and the Heart",
-              "artist_name": "The Head and the Heart",
-              "image_url": "www.barfoo.com/bar",
-              "name": "Down in the Valley"
+          "queue": {
+            "front": "frontSong",
+            "back": "backSong",
+
+            "frontSong": {
+
+              "data": {
+                "album_name": "Crash",
+                "artist_name": "Dave Matthews Band",
+                "image_url": "www.foobar.com/foo",
+                "name": "Two Step"
+              },
+
+              "requester": "admin",
+
+              "coinsBeforeSong": 5,
+
+              "upvoters": {
+                "upvoter": 1
+              },
+
+              "downvoters": {
+                "downvoter": 1
+              },
+
+              "next": "backSong"
             },
 
-            "requester": "user",
+            "backSong": {
 
-            "coinsBeforeSong": 5
+              "data": {
+                "album_name": "The Head and the Heart",
+                "artist_name": "The Head and the Heart",
+                "image_url": "www.barfoo.com/bar",
+                "name": "Down in the Valley"
+              },
+
+              "requester": "user",
+
+              "coinsBeforeSong": 5
+            }
+          }
+        },
+
+        // An open network is the least secure: an user can add themselves without
+        // admin approval. As of right now, this is the only type of network we
+        // have.
+        "openNet": {
+
+          "admins": {
+            "admin": 1
+          },
+
+          "users": {
+            "admin": 1,
+            "user": 1
           }
         }
+
       }
     },
 
@@ -181,14 +200,21 @@
     "users/user/networks/newNet": {
       "canWrite": [
         {"auth": "user", "data": {
-          "coins": 5
+          "coins": 5,
+          "security": "open"
         }}
       ],
       "cannotWrite": [
         {"auth": "user", "data": {
-          "coins": 10
+          "coins": 10,
+          "security": "open"
         }},
-        {"auth": "user", "data": {}},
+        {"auth": "user", "data": {
+          "coins": 5
+        }},
+        {"auth": "user", "data": {
+          "security": "open"
+        }},
         {"auth": "admin", "data": {
           "coins": 5
         }},
@@ -212,20 +238,20 @@
     // NETWORK TESTS
 
     // A user can read the data in their own network
-    "networks/testNet": {
+    "networks/open/testNet": {
       "canRead": ["user", "admin"],
       "cannotRead": ["anon"]
     },
 
     // A user can remove themselves from a network, and admins can kick users
     // out of their networks
-    "networks/testNet/users/user": {
+    "networks/open/testNet/users/user": {
       "canWrite": [
         {"auth": "user", "data": null},
         {"auth": "admin", "data": null}
       ]
     },
-    "networks/testNet/users/admin": {
+    "networks/open/testNet/users/admin": {
       "canWrite": [
         {"auth": "admin", "data": null}
       ],
@@ -234,12 +260,44 @@
       ]
     },
 
-    /// \todo Test .write rules for network/admins. 
+    // Security tests: open network
+    // * Users can add themselves autonomously
+    // * Admins can invite users, but the users must accept the invitation and
+    //    add themselves
+    // * Unauthenticated clients cannot join the network
+    // * Admins can add more admins
+    "networks/open/openNet/users/newUser": {
+      "canWrite": [
+        {"auth": "newUser", "data": 1}
+      ],
+      "cannotWrite": [
+        {"auth": "admin", "data": 1},
+        {"auth": "user", "data": 1},
+        {"auth": "anon", "data": 1}
+      ]
+    },
+    "networks/open/openNet/users/anon": {
+      "cannotWrite": [
+        {"auth": "anon", "data": 1},
+        {"auth": "user", "data": 1},
+        {"auth": "admin", "data": 1}
+      ]
+    },
+    "networks/open/openNet/admins/user": {
+      "canWrite": [
+        {"auth": "admin", "data": 1}
+      ],
+      "cannotWrite": [
+        {"auth": "user", "data": 1}
+      ]
+    },
+
+    /// \todo Tests for other security levels. 
     /// Correct behavior will depend on resolution to issues #7, #8
 
     // A user can add or remove themselves but no one else to the upvote/downvote
     // list of the currently playing song only
-    "networks/testNet/queue/frontSong/upvoters/user": {
+    "networks/open/testNet/queue/frontSong/upvoters/user": {
       "canWrite": [
         {"auth": "user", "data": 1},
         {"auth": "user", "data": null}
@@ -251,7 +309,7 @@
         {"auth": "anon", "data": null}
       ]
     },
-    "networks/testNet/queue/frontSong/upvoters/admin": {
+    "networks/open/testNet/queue/frontSong/upvoters/admin": {
       "canWrite": [
         {"auth": "admin", "data": 1},
         {"auth": "admin", "data": null}
@@ -263,17 +321,17 @@
         {"auth": "anon", "data": null}
       ]
     },
-    "networks/testNet/queue/backSong/upvoters/user": {
+    "networks/open/testNet/queue/backSong/upvoters/user": {
       "cannotWrite": [
         {"auth": "user", "data": 1}
       ]
     },
-    "networks/testNet/queue/backSong/upvoters/admin": {
+    "networks/open/testNet/queue/backSong/upvoters/admin": {
       "cannotWrite": [
         {"auth": "admin", "data": 1}
       ]
     },
-    "networks/testNet/queue/frontSong/downvoters/user": {
+    "networks/open/testNet/queue/frontSong/downvoters/user": {
       "canWrite": [
         {"auth": "user", "data": 1},
         {"auth": "user", "data": null}
@@ -285,7 +343,7 @@
         {"auth": "anon", "data": null}
       ]
     },
-    "networks/testNet/queue/frontSong/downvoters/admin": {
+    "networks/open/testNet/queue/frontSong/downvoters/admin": {
       "canWrite": [
         {"auth": "admin", "data": 1},
         {"auth": "admin", "data": null}
@@ -297,22 +355,22 @@
         {"auth": "anon", "data": null}
       ]
     },
-    "networks/testNet/queue/backSong/downvoters/user": {
+    "networks/open/testNet/queue/backSong/downvoters/user": {
       "cannotWrite": [
         {"auth": "user", "data": 1}
       ]
     },
-    "networks/testNet/queue/backSong/downvoters/admin": {
+    "networks/open/testNet/queue/backSong/downvoters/admin": {
       "cannotWrite": [
         {"auth": "admin", "data": 1}
       ]
     },
 
     // A user cannot be in the upvote and downvote list at the same time
-    "networks/testNet/queue/frontSong/upvoters/downvoter": {
+    "networks/open/testNet/queue/frontSong/upvoters/downvoter": {
       "cannotWrite": [{"auth": "downvoter", "data": 1}]
     },
-    "networks/testNet/queue/frontSong/downvoters/upvoter": {
+    "networks/open/testNet/queue/frontSong/downvoters/upvoter": {
       "cannotWrite": [{"auth": "upvoter", "data": 1}]
     }
 

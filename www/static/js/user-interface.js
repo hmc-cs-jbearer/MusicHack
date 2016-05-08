@@ -34,21 +34,24 @@ function updateCoinCount(newCount) {
 // Update the page whenever data changes in the network with ID nid
 function syncToNetwork(nid) {
 
-  // Update the page when the current song changes
-  firebase.child("networks/" + nid + "/queue").on("value", function (queue) {
-    var song_id = queue.child("front").val();
+  // Get the security of the network
+  getData(["users", user.uid, "networks", nid, "security"].join("/"), function(security) {
+    // Update the page when the current song changes
+    firebase.child(["networks", security, nid, "queue", "front"].join("/")).on("value", function (front) {
+      var songId = front.val();
 
-    if (!song_id) {
-      // No song currently playing
-      return;
-    }
+      if (!songId) {
+        // No song currently playing
+        return;
+      }
 
-    var data = queue.child(song_id).child("data").val();
-
-    // The song ID is not stored with the rest of the data since it is the key
-    data.song_id = song_id;
-
-    updateSongData(data);
+      // Get the song data
+      getData(["networks", security, nid, "queue", songId, "data"].join("/"), function(data) {
+        // The song ID is not stored with the rest of the data since it is the key
+        data.songId = songId;
+        updateSongData(data);
+      });
+    });
   });
 
   // Update the page when the user's coin count changes
@@ -58,28 +61,32 @@ function syncToNetwork(nid) {
 }
 
 /**
- * Either upvote or downvot the current song on the network with the given ID.
+ * Either upvote or downvote the current song on the network with the given ID.
  * addList: either "upvoters" or "downvoters", the list to add a vote to
  * removeList: the complement of addlist (ie either "downvoters" or "upvoters")
  */
 function vote(nid, addList, removeList) {
+
+  // Get the security of the network
+  getData(["users", user.uid, "networks", nid, "security"].join("/"), function(security) {
   
-  var queuePath = "/networks/" + nid + "/queue";
+    var queuePath = ["networks", security, nid, "queue"].join("/");
 
-  // get the song to upvote
-  getData([queuePath, "front"].join("/"), function(songId) {
-    if (!songId) {
-      // No song playing right now
-      return;
-    }   
+    // get the song to upvote
+    getData([queuePath, "front"].join("/"), function(songId) {
+      if (!songId) {
+        // No song playing right now
+        return;
+      }   
 
-    // Just in case the user has already voted and is changing their vote,
-    // remove them from the other list
-    setData([queuePath, songId, removeList, user.uid].join("/"), null);
+      // Just in case the user has already voted and is changing their vote,
+      // remove them from the other list
+      setData([queuePath, songId, removeList, user.uid].join("/"), null);
 
-    // Add the user's vote
-    setData([queuePath, songId, addList, user.uid].join("/"), 1);
-  });
+      // Add the user's vote
+      setData([queuePath, songId, addList, user.uid].join("/"), 1);
+    });
+  })
 }
 
 // Upvote the current song on the network with ID nid

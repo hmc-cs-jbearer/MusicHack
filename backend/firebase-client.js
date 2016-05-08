@@ -107,7 +107,7 @@ function syncToNetwork(network) {
  */
 function addListeners() {
   // sync with each network, and listen for the addition of networks
-  firebase.child("networks").on("child_added", syncToNetwork);
+  firebase.child("networks").child("open").on("child_added", syncToNetwork);
 }
 
 /**

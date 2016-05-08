@@ -21,14 +21,6 @@
 
 {% block scripts %}
 
-<script type="text/javascript">
-  function leaveNetwork(nid) {
-    eraseData("/users/" + user.uid + "/networks/{{ nid }}");
-    eraseData("/networks/{{ nid }}/users/" + user.uid);
-    eraseData("/networks/{{ nid }}/admins/" + user.uid);
-
-    window.location = "/";
-  }
-</script>
+<script type="text/javascript" src="/static/js/networks.js"></script>
 
 {% endblock %}
