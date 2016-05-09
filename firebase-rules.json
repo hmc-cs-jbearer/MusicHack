@@ -11,19 +11,20 @@
         "$network" : {
 
           // A user can add a new network
-          ".write": "!data.exists()",
+          ".write": "!data.exists() && newData.hasChild('admins') && newData.child('admins').hasChild(auth.uid)",
             
           "users" : {
             "$user" : {
-              // A user can edit their own data, or an admin can add or remove a user
-              ".write" : "$user == auth.uid || root.child('networks').child($network).child('admins').hasChild(auth.uid)"
+              // A user can edit their own data, or an admin can remove a user
+              ".write" : "$user == auth.uid || (!newData.exists() && data.parent().parent().child('admins').hasChild(auth.uid))"
             }
           },
           
           "admins" : {
             "$admin" : {
                // An admin can edit their own data and add a new admin
-              ".write" : "$admin == auth.uid || (!data.exists())"
+              ".write" : "(data.exists() && $admin == auth.uid) || 
+                (!data.exists() && data.parent().hasChild(auth.uid))"
             }
           },
           
@@ -69,7 +70,7 @@
                 "$upvoter": {
                   // Any user can add themselves as an upvoter to the front song...
                   ".write": "newData.parent().parent().parent().child('front').val() == $song &&
-                    root.child('networks').child($network).child('users').hasChild(auth.uid) &&
+                    root.child('networks').child('open').child($network).child('users').hasChild(auth.uid) &&
                     $upvoter == auth.uid",
 
                   // As long as they are not currently a downvoter
@@ -81,7 +82,7 @@
                 "$downvoter": {
                   // Any user can add themselves as a downvoter to the front song...
                   ".write": "newData.parent().parent().parent().child('front').val() == $song &&
-                    root.child('networks').child($network).child('users').hasChild(auth.uid) &&
+                    root.child('networks').child('open').child($network).child('users').hasChild(auth.uid) &&
                     $downvoter == auth.uid",
 
                   // As long as they are not currently an upvoter
