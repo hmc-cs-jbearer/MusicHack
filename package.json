@@ -7,12 +7,12 @@
   },
   "devDependencies": {
     "jsonminify": "^0.4.1",
-    "targaryen": "^2.1.0"
+    "targaryen": "^2.1.1"
   },
   "scripts": {
     "upload-rules": "node util/minify.js firebase-rules.json; node util/upload-minified-rules.js",
     "prestart": "npm run-script upload-rules",
-    "start": "firebase serve > log/firebase-server.log",
+    "start": "echo \"Listening on port 5000\"; firebase serve -p 5000 > log/firebase-server.log",
     "pretest": "node util/minify.js firebase-rules.json test/security-tests.json",
     "test": "targaryen firebase-rules-min.json test/security-tests-min.json"
   },
