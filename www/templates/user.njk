@@ -9,14 +9,17 @@
     <button type="submit">Create New Network </button>
   </form>
 
+
   <form action="/join-network">
     <button type="submit"> Join a Network </button>
   </form>
 
+{% if current %}
   <form action="/leave-network">
     <input type="hidden" name="nid" value="{{ current }}"/>
     <button type="submit"> Leave {{ current }} </button>
   </form>
+{% endif %}
 
   <button type="button" onclick="logout()">Logout</button>
 
