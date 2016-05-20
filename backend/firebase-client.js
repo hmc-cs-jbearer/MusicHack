@@ -61,12 +61,12 @@ function nextSong(queue, songId) {
 
     // Here we check if coinsBeforeSong has been set. If not, this song is just
     // starting and we need to set it. If it is set, it means the song has
-    // already been playing, and the server has just started. In that case we
-    // keep the old value.
+    // already been playing, and the server has just started or something.
+    // In that case we keep the old value.
     song.child("coinsBeforeSong").once("value", function(coinsBeforeSong) {
-      if (coinsBeforeSong.exists()) {
 
-        console.log("Song playing. Coins:", coinsBeforeSong.val());
+      if (coinsBeforeSong.exists()) {
+        console.log(`Song ${song.key()} currently playing. Coins before:`, coinsBeforeSong.val());
 
         // Listen for changes in the upvote/downvote list for the new song
         song.on("value", function(song) {
@@ -74,7 +74,7 @@ function nextSong(queue, songId) {
         });
       } else {
 
-        console.log("Getting coins before new song.");
+        console.log(`Switching to new song ${song.key()}.`);
         
         // Get the user's coin count
         network.child("coins").once("value", function(coins) {
@@ -122,10 +122,11 @@ function listen() {
   firebase.authWithCustomToken(secret, function(error) {
     if (error) {
       console.log("Unable to authenticate to Firebase:", error);
+      process.exit(1);
     } else {
       // Once authenticated, setup Firebase event listeners
       addListeners();
-      console.log("Listening.");
+      console.log("Listening for changes to the Firebase data.");
     }
   });
 }

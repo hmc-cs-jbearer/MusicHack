@@ -51,6 +51,20 @@ function syncToNetwork(nid) {
         data.songId = songId;
         updateSongData(data);
       });
+
+      // Check if the user previously upvoted this song
+      getData(["networks", security, nid, "queue", songId, "upvoters"].join("/"), function(upvoters) {
+        if (user.uid in upvoters) {
+          $("#upvote").addClass("active");
+        } else {
+          // Check if, instead, the user downvoted the song
+          getData(["networks", security, nid, "queue", songId, "downvoters"].join("/"), function(downvoters) {
+            if (user.uid in downvoters) {
+              $("#downvote").addClass("active");
+            }
+          });
+        }
+      });
     });
   });
 
@@ -91,22 +105,16 @@ function vote(nid, addList, removeList) {
 
 // Upvote the current song on the network with ID nid
 function upvote(nid) {
+  $("#upvote").addClass("active");
+  $("#downvote").removeClass("active");
   vote(nid, "upvoters", "downvoters");
 }
 
 // Downvote the current song on the network with ID nid
 function downvote(nid) {
+  $("#downvote").addClass("active");
+  $("#upvote").removeClass("active");
   vote(nid, "downvoters", "upvoters");
-}
-
-// Advance the network with ID nid to the next song in the queue
-function nextSong(nid) {
-  $.ajax("/next-song", {
-    data: {
-      nid: nid,
-      token: user.token
-    }
-  });
 }
 
 /**
