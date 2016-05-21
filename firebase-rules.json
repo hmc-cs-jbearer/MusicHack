@@ -3,12 +3,17 @@
       
     "networks": {
 
-      "open": {
+      "$security": {
       
-        // Only logged in users can see networks
-        ".read" : "auth != null",
+        // Logged-in users can browse all open and private networks
+        ".read" : "($security === 'open' || $security === 'private') &&
+          auth != null",
         
         "$network" : {
+
+          // Only network members can read invisible network data
+          ".read" : "$security === 'invisible' && 
+            (data.child('users').hasChild(auth.uid) || data.child('invitees').hasChild(auth.uid))",
 
           // A user can add a new network
           ".write": "!data.exists() && newData.hasChild('admins') && newData.child('admins').hasChild(auth.uid)",
@@ -16,15 +21,49 @@
           "users" : {
             "$user" : {
               // A user can edit their own data, or an admin can remove a user
-              ".write" : "$user == auth.uid || (!newData.exists() && data.parent().parent().child('admins').hasChild(auth.uid))"
+              ".write" : "
+              ($security === 'open' &&
+                ($user === auth.uid || (!newData.exists() && data.parent().parent().child('admins').hasChild(auth.uid)))) ||
+              ($security === 'private' &&
+                ((data.exists() && $user === auth.uid) ||
+                (!data.exists() && data.parent().parent().child('admins').hasChild(auth.uid) && data.parent().parent().child('requesters').hasChild($user)))) ||
+              (($security === 'private' || $security === 'invisible') &&
+                ((data.exists() && $user === auth.uid) ||
+                (!data.exists() && $user === auth.uid) && data.parent().parent().child('invitees').hasChild($user)))"
             }
           },
           
           "admins" : {
             "$admin" : {
                // An admin can edit their own data and add a new admin
-              ".write" : "(data.exists() && $admin == auth.uid) || 
+              ".write" : "(data.exists() && $admin === auth.uid) || 
                 (!data.exists() && data.parent().hasChild(auth.uid))"
+            }
+          },
+
+          // Only applicable for private and invisible networks
+          // List of users invited to join the network by an admin, pending acceptance of the
+          // invitation by the user
+          "invitees" : {
+            "$user": {
+              // Admins can invite a user, or a user can accept/decline an invitation
+              ".write": "data.parent().parent().child('admins').hasChild(auth.uid) ||
+                (!newData.exists() && $user === auth.uid)",
+
+              ".validate": "$security === 'private' || $security === 'invisible'"
+            }
+          },
+
+          // Only applicable for private networks
+          // List of users who have requested permission to join the network. Pending approval by
+          // an admin.
+          "requesters" : {
+            "$user": {
+              // A user can make a request, and admins can approve or deny it
+              ".write": "$user === auth.uid || 
+                (!newData.exists() && data.parent().parent().child('admins').hasChild(auth.uid))",
+
+              ".validate": "$security === 'private'"
             }
           },
           
@@ -52,7 +91,7 @@
 
               // New songs can be added to the back of the queue
               ".write": "root.child('networks').child($network).child('users').hasChild(auth.uid) && !data.exists() &&
-                !newData.hasChild('next') && newData.parent().child('back').val() == $song",
+                !newData.hasChild('next') && newData.parent().child('back').val() === $song",
 
               ".validate" : "newData.hasChild('data') && newData.hasChild('requester')",
               
@@ -69,9 +108,9 @@
 
                 "$upvoter": {
                   // Any user can add themselves as an upvoter to the front song...
-                  ".write": "newData.parent().parent().parent().child('front').val() == $song &&
+                  ".write": "newData.parent().parent().parent().child('front').val() === $song &&
                     root.child('networks').child('open').child($network).child('users').hasChild(auth.uid) &&
-                    $upvoter == auth.uid",
+                    $upvoter === auth.uid",
 
                   // As long as they are not currently a downvoter
                   ".validate": "!newData.parent().parent().child('downvoters').hasChild($upvoter)"
@@ -81,9 +120,9 @@
               "downvoters": {
                 "$downvoter": {
                   // Any user can add themselves as a downvoter to the front song...
-                  ".write": "newData.parent().parent().parent().child('front').val() == $song &&
+                  ".write": "newData.parent().parent().parent().child('front').val() === $song &&
                     root.child('networks').child('open').child($network).child('users').hasChild(auth.uid) &&
-                    $downvoter == auth.uid",
+                    $downvoter === auth.uid",
 
                   // As long as they are not currently an upvoter
                   ".validate": "!newData.parent().parent().child('upvoters').hasChild($downvoter)"
@@ -101,17 +140,17 @@
       "$user" : {
 
         // Any user can read all of their own data
-        ".read" : "auth.uid == $user",
+        ".read" : "auth.uid === $user",
 
         // A user can add themselves as a user, or delete their account
-        ".write" : "auth.uid == $user && (!data.exists() || !newData.exists())",
+        ".write" : "auth.uid === $user && (!data.exists() || !newData.exists())",
 
         // A new user can add themselves
         ".validate" : "!newData.exists() || newData.hasChildren(['name', 'email'])",
 
         "name": {
           // A user can always edit their name
-          ".write": "auth.uid == $user",
+          ".write": "auth.uid === $user",
 
           ".validate": "newData.isString()"
         },
@@ -128,12 +167,12 @@
           "$network" : {
 
             // A user can add themselves to networks or remove themselves
-            ".write": "auth.uid == $user && (!data.exists() || !newData.exists())",
+            ".write": "auth.uid === $user && (!data.exists() || !newData.exists())",
 
             // Users get 5 coins upon joining a new network
             ".validate": "!newData.exists() || 
-              (newData.hasChildren(['coins', 'security']) && newData.child('coins').val() == 5) &&
-                newData.child('security').val() == 'open'"
+              (newData.hasChildren(['coins', 'security']) && newData.child('coins').val() === 5) &&
+                newData.child('security').val() === 'open'"
           }
         }
        
