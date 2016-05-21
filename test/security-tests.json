@@ -62,9 +62,6 @@
           }
         },
 
-        // An open network is the least secure: an user can add themselves without
-        // admin approval. As of right now, this is the only type of network we
-        // have.
         "openNet": {
 
           "admins": {
@@ -77,7 +74,49 @@
           }
         }
 
+      },
+
+      "private": {
+        "privateNet": {
+
+          "users": {
+            "admin": 1,
+            "user": 1
+          },
+
+          "admins": {
+            "admin": 1
+          },
+
+          "invitees": {
+            "invitee": 1
+          },
+
+          "requesters": {
+            "requester": 1
+          }
+
+        }
+      },
+
+      "invisible": {
+        "invisibleNet": {
+
+          "users": {
+            "admin": 1,
+            "user": 1
+          },
+
+          "admins": {
+            "admin": 1
+          },
+
+          "invitees": {
+            "invitee": 1
+          }
+        }
       }
+
     },
 
     "users": {
@@ -88,7 +127,20 @@
         "networks": {
           "testNet": {
             "coins": 5,
-            "is_admin": "true"
+            "is_admin": "true",
+            "security": "open"
+          },
+
+          "openNet": {
+            "coins": 5,
+            "is_admin": "true",
+            "security": "open"
+          },
+
+          "privateNet": {
+            "coins": 5,
+            "is_admin": "true",
+            "security": "private"
           }
         }
       },
@@ -98,7 +150,18 @@
         "email": "buser@hmc.edu",
         "networks": {
           "testNet": {
-            "coins": 5
+            "coins": 5,
+            "security": "open"
+          },
+
+          "openNet": {
+            "coins": 5,
+            "security": "open"
+          },
+
+          "privateNet": {
+            "coins": 5,
+            "security": "open"
           }
         }
       },
@@ -108,7 +171,8 @@
         "email": "uvoter@hmc.edu",
         "networks": {
           "testNet": {
-            "coins": 5
+            "coins": 5,
+            "security": "open"
           }
         }
       },
@@ -118,10 +182,22 @@
         "email": "dvoter@hmc.edu",
         "networks": {
           "testNet": {
-            "coins": 5
+            "coins": 5,
+            "security": "open"
           }
         }
+      },
+
+      "invitee": {
+        "name": "Invitee",
+        "email": "invitee@hmc.edu"
+      },
+
+      "requester": {
+        "name": "Requester",
+        "email": "requester@hmc.edu"
       }
+
     }
   },
 
@@ -131,6 +207,8 @@
     "upvoter": {"uid": "upvoter"},
     "downvoter": {"uid": "downvoter"},
     "newUser": {"uid": "newUser"},
+    "invitee": {"uid": "invitee"},
+    "requester": {"uid": "requester"},
     "anon": null
   },
 
@@ -196,7 +274,7 @@
       ]
     },
 
-    // Users can add themselves to a network iff they start out with 5 coins
+    // Users can add themselves to a network iff they start out with 5 coins and the correct security
     "users/user/networks/newNet": {
       "canWrite": [
         {"auth": "user", "data": {
@@ -208,6 +286,10 @@
         {"auth": "user", "data": {
           "coins": 10,
           "security": "open"
+        }},
+        {"auth": "user", "data": {
+          "coins": 5,
+          "security": "private"
         }},
         {"auth": "user", "data": {
           "coins": 5
@@ -232,10 +314,9 @@
       "cannotWrite": [{"auth": "user", "data": null}]
     },
 
-    /// \todo Can users add themselves to newtorks?
-    // ^ Depend on design decision resolving issues #7, #8
-
     // NETWORK TESTS
+
+    // Basic network mechanics: same for all networks
 
     // A user can read the data in their own network
     "networks/open/testNet": {
@@ -259,41 +340,6 @@
         {"auth": "user", "data": null}
       ]
     },
-
-    // Security tests: open network
-    // * Users can add themselves autonomously
-    // * Admins can invite users, but the users must accept the invitation and
-    //    add themselves
-    // * Unauthenticated clients cannot join the network
-    // * Admins can add more admins
-    "networks/open/openNet/users/newUser": {
-      "canWrite": [
-        {"auth": "newUser", "data": 1}
-      ],
-      "cannotWrite": [
-        {"auth": "admin", "data": 1},
-        {"auth": "user", "data": 1},
-        {"auth": "anon", "data": 1}
-      ]
-    },
-    "networks/open/openNet/users/anon": {
-      "cannotWrite": [
-        {"auth": "anon", "data": 1},
-        {"auth": "user", "data": 1},
-        {"auth": "admin", "data": 1}
-      ]
-    },
-    "networks/open/openNet/admins/user": {
-      "canWrite": [
-        {"auth": "admin", "data": 1}
-      ],
-      "cannotWrite": [
-        {"auth": "user", "data": 1}
-      ]
-    },
-
-    /// \todo Tests for other security levels. 
-    /// Correct behavior will depend on resolution to issues #7, #8
 
     // A user can add or remove themselves but no one else to the upvote/downvote
     // list of the currently playing song only
@@ -372,7 +418,195 @@
     },
     "networks/open/testNet/queue/frontSong/downvoters/upvoter": {
       "cannotWrite": [{"auth": "upvoter", "data": 1}]
-    }
+    },
 
+    // Security tests: different for each security level
+
+    // Security tests: open network
+    // * Users can add themselves autonomously
+    // * Admins can invite users, but the users must accept the invitation and
+    //    add themselves
+    // * Unauthenticated clients cannot join the network
+    // * Admins can add more admins
+    // * All logged-in users can browse open networks
+    "networks/open/openNet": {
+      "canRead": ["admin", "user", "newUser"],
+      "cannotRead": ["anon"]
+    },
+    "networks/open/openNet/users/newUser": {
+      "canWrite": [
+        {"auth": "newUser", "data": 1}
+      ],
+      "cannotWrite": [
+        {"auth": "admin", "data": 1},
+        {"auth": "user", "data": 1},
+        {"auth": "anon", "data": 1}
+      ]
+    },
+    "networks/open/openNet/users/anon": {
+      "cannotWrite": [
+        {"auth": "anon", "data": 1},
+        {"auth": "user", "data": 1},
+        {"auth": "admin", "data": 1}
+      ]
+    },
+    "networks/open/openNet/admins/user": {
+      "canWrite": [
+        {"auth": "admin", "data": 1}
+      ],
+      "cannotWrite": [
+        {"auth": "user", "data": 1}
+      ]
+    },
+
+    // Security tests: private network
+    // * Users can request to join. They will be added when an admin approves the request.
+    // * Admins can invite users, but the users must accept the invitation and
+    //    add themselves
+    // * Unauthenticated clients cannot join the network
+    // * Admins can add more admins
+    // * All logged-in users can browse (but not join) private networks
+    "networks/private/privateNet": {
+      "canRead": ["admin", "user", "newUser"],
+      "cannotRead": ["anon"]
+    },
+    "networks/private/privateNet/invitees/invitee": {
+      "canWrite": [
+        // User can accept/decline invitation
+        {"auth": "invitee", "data": null}
+      ],
+      "cannotWrite": [
+        // Users cannot invite themselves
+        {"auth": "invitee", "data": 1}
+      ]
+    },
+    "networks/private/privateNet/invitees/newUser": {
+      "canWrite": [
+        {"auth": "admin", "data": 1}
+      ],
+      "cannotWrite": [
+        {"auth": "newUser", "data": 1}
+      ]
+    },
+    "networks/private/privateNet/requesters/requester": {
+      "canWrite": [
+        // Admin can accept/deny request
+        {"auth": "admin", "data": null}
+      ],
+      "cannotWrite": [
+        {"auth": "user", "data": null}
+      ]
+    },
+    "networks/private/privateNet/requesters/newUser": {
+      "canWrite": [
+        {"auth": "newUser", "data": 1}
+      ],
+      "cannotWrite": [
+        {"auth": "admin", "data": 1},
+        {"auth": "user", "data": 1}
+      ]
+    },
+    "networks/private/privateNet/users/invitee": {
+      "canWrite": [
+        {"auth": "invitee", "data": 1}
+      ],
+      "cannotWrite": [
+        {"auth": "admin", "data": 1},
+        {"auth": "user", "data": 1},
+        {"auth": "newUser", "data": 1},
+        {"auth": "requester", "data": 1},
+        {"auth": "anon", "data": 1}
+      ]
+    },
+    "networks/private/privateNet/users/requester": {
+      "canWrite": [
+        {"auth": "admin", "data": 1}
+      ],
+      "cannotWrite": [
+        {"auth": "user", "data": 1},
+        {"auth": "newUser", "data": 1},
+        {"auth": "requester", "data": 1},
+        {"auth": "anon", "data": 1}
+      ]
+    },
+    "networks/private/privateNet/users/anon": {
+      "cannotWrite": [
+        {"auth": "anon", "data": 1},
+        {"auth": "user", "data": 1},
+        {"auth": "admin", "data": 1}
+      ]
+    },
+    "networks/private/privateNet/admins/user": {
+      "canWrite": [
+        {"auth": "admin", "data": 1}
+      ],
+      "cannotWrite": [
+        {"auth": "user", "data": 1}
+      ]
+    },
+
+    // Security tests: invisible network
+    // * Users cannot request to join
+    // * Admins can invite users, but the users must accept the invitation and
+    //    add themselves
+    // * Unauthenticated clients cannot join the network
+    // * Admins can add more admins
+    // * Only current users and invitees can view invisible networks
+    "networks/invisible/invisibleNet": {
+      "canRead": ["admin", "user", "invitee"],
+      "cannotRead": ["newUser", "anon"]
+    },
+    "networks/invisible/invisibleNet/invitees/invitee": {
+      "canWrite": [
+        // User can accept/decline invitation
+        {"auth": "invitee", "data": null}
+      ],
+      "cannotWrite": [
+        // Users cannot invite themselves
+        {"auth": "invitee", "data": 1}
+      ]
+    },
+    "networks/invisible/invisibleNet/invitees/newUser": {
+      "canWrite": [
+        {"auth": "admin", "data": 1}
+      ],
+      "cannotWrite": [
+        {"auth": "newUser", "data": 1}
+      ]
+    },
+    "networks/invisible/invisibleNet/requesters/newUser": {
+      "cannotWrite": [
+        {"auth": "newUser", "data": 1},
+        {"auth": "user", "data": 1},
+        {"auth": "admin", "data": 1}
+      ]
+    },
+    "networks/invisible/invisibleNet/users/invitee": {
+      "canWrite": [
+        {"auth": "invitee", "data": 1}
+      ],
+      "cannotWrite": [
+        {"auth": "admin", "data": 1},
+        {"auth": "user", "data": 1},
+        {"auth": "newUser", "data": 1},
+        {"auth": "requester", "data": 1},
+        {"auth": "anon", "data": 1}
+      ]
+    },
+    "networks/invisible/invisibleNet/users/anon": {
+      "cannotWrite": [
+        {"auth": "anon", "data": 1},
+        {"auth": "user", "data": 1},
+        {"auth": "admin", "data": 1}
+      ]
+    },
+    "networks/invisible/invisibleNet/admins/user": {
+      "canWrite": [
+        {"auth": "admin", "data": 1}
+      ],
+      "cannotWrite": [
+        {"auth": "user", "data": 1}
+      ]
+    }
   }
 }
